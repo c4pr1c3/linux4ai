@@ -1,6 +1,6 @@
 ---
-title: "Unit 01: 环境构建与 CLI 生存"
-subtitle: "WSL, SSH & Remote Development"
+title: "第一单元: 环境构建与 CLI 生存指南"
+subtitle: "WSL, SSH & 远程开发"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation
@@ -15,6 +15,19 @@ output: revealjs::revealjs_presentation
 - **服务器事实标准**: 全球 96.3% 的 Top 1M 服务器运行 Linux
 - **云原生基石**: Docker, Kubernetes, DevOps 工具链
 - **AI 基础设施**: PyTorch, TensorFlow, CUDA 训练环境
+
+---
+
+## Linux 内核 vs 发行版
+
+- **Kernel (内核)**: 操作系统的心脏 (由 Linus Torvalds 创立并维护主线版本，同时有全球成千上万的社区开发者、公司（如Red Hat、IBM、SUSE）参与贡献代码和维护特定发行版的分支
+  - 负责硬件驱动、内存管理、进程调度
+  - 查看版本: `uname -r`
+- **Distribution (发行版)**: 内核 + GNU 工具 + 包管理器 + 桌面环境
+  - **Debian 系**: Ubuntu, Kali (使用 `apt`, `.deb`)
+  - **RedHat 系**: RHEL, CentOS, Fedora (使用 `dnf`/`yum`, `.rpm`)
+  - **Arch 系**: Arch Linux, Manjaro (使用 `pacman`)
+  - 查看版本: `cat /etc/os-release`
 
 ---
 

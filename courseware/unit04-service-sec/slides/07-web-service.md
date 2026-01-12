@@ -1,6 +1,6 @@
 ---
-title: "Unit 04: Web 服务最小闭环"
-subtitle: "Nginx, Reverse Proxy & Logging"
+title: "第四单元：服务交付与安全基线"
+subtitle: "Nginx, 反向代理 & 日志"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation

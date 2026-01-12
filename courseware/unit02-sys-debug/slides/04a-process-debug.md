@@ -1,6 +1,6 @@
 ---
-title: "Unit 02: 系统排障与观测"
-subtitle: "System Observability & Troubleshooting"
+title: "第二单元: 系统运维与排障"
+subtitle: "系统可观测性 & 故障排查"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation

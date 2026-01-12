@@ -1,6 +1,6 @@
 ---
-title: "Unit 04: 安全基线与 AI 辅助运维"
-subtitle: "Security Baseline & AI-Assisted Ops"
+title: "第四单元：服务交付与安全基线"
+subtitle: "安全基线 & AI 辅助运维"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation

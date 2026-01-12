@@ -1,6 +1,6 @@
 ---
-title: "Unit 01: CLI 生存指南"
-subtitle: "Command Line Interface Survival Guide"
+title: "第一单元: 环境构建与 CLI 生存指南"
+subtitle: "命令行的艺术与技术"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation

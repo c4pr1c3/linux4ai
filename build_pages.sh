@@ -69,17 +69,24 @@ html_escape() {
   printf '%s' "$s"
 }
 
-extract_title_from_line2() {
+extract_frontmatter_key() {
   local file="$1"
+  local key="$2"
   local line
-  line="$(sed -n '2p' "$file" | tr -d '\r')"
+  # Limit search to the first 20 lines to avoid matching content
+  line="$(head -n 20 "$file" | grep "^${key}:" | head -n 1 | tr -d '\r')"
   line="$(trim "$line")"
-  if [[ "$line" != title:* ]]; then
-    printf '%s' ""
+  
+  if [[ -z "$line" ]]; then
+    printf ''
     return 0
   fi
-  line="${line#title:}"
+  
+  # Remove key:
+  line="${line#${key}:}"
   line="$(trim "$line")"
+  
+  # Remove quotes
   if [[ "$line" == \"*\" && "$line" == *\" ]]; then
     line="${line#\"}"
     line="${line%\"}"
@@ -88,6 +95,14 @@ extract_title_from_line2() {
     line="${line%\'}"
   fi
   printf '%s' "$line"
+}
+
+extract_title() {
+  extract_frontmatter_key "$1" "title"
+}
+
+extract_subtitle() {
+  extract_frontmatter_key "$1" "subtitle"
 }
 
 extract_first_h1_title() {
@@ -149,8 +164,15 @@ done
   for file in "${SLIDE_MD_FILES[@]}"; do
     rel_path_from_root="$(realpath --relative-to="$PROJECT_ROOT" "$file")"
     html_file="${rel_path_from_root%.md}.html"
-    title="$(extract_title_from_line2 "$file")"
+    title="$(extract_title "$file")"
+    subtitle="$(extract_subtitle "$file")"
     title="$(trim "$title")"
+    subtitle="$(trim "$subtitle")"
+
+    if [ -n "$subtitle" ]; then
+      title="$title - $subtitle"
+    fi
+
     if [ -z "$title" ]; then
       title="$html_file"
     fi

@@ -1,6 +1,6 @@
 ---
-title: "Unit 03: Shell 脚本工程化"
-subtitle: "Shell Scripting: From One-off to Production"
+title: "第三单元：自动化与可复现"
+subtitle: "脚本编程: 从单行脚本到生产级"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation

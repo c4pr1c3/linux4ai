@@ -1,6 +1,6 @@
 ---
-title: "Unit 02: 权限迷宫与文件系统"
-subtitle: "Permissions, ACL & Filesystem Hierarchy"
+title: "第二单元: 系统运维与排障"
+subtitle: "权限, 访问控制列表 & 文件系统结构"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation

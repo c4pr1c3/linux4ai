@@ -29,6 +29,7 @@ $endif$
 $for(css)$
   <link rel="stylesheet" href="$css$"/>
 $endfor$
+  <link rel="stylesheet" href="$revealjs-url$/plugin/highlight/monokai.css">
   <!-- Printing and PDF exports -->
 $if(math)$
   $math$
@@ -69,12 +70,14 @@ $body$
   </div>
 
   <script src="$revealjs-url$/dist/reveal.js"></script>
+  <script src="$revealjs-url$/plugin/highlight/highlight.js"></script>
 
   <script>
 
       // Full list of configuration options available at:
       // https://github.com/hakimel/reveal.js#configuration
       Reveal.initialize({
+        plugins: [ RevealHighlight ],
 $if(controls)$
         // Display controls in the bottom right corner
         controls: $controls$,

@@ -1,6 +1,6 @@
 ---
-title: "Unit 03: 最小化配置管理 (Ansible)"
-subtitle: "Infrastructure as Code (IaC) with Ansible"
+title: "第三单元：自动化与可复现"
+subtitle: "代码即基础设施：Ansible 基础"
 author: 黄玮
 date: 2026-01
 output: revealjs::revealjs_presentation
