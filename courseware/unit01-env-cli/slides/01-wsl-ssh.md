@@ -54,6 +54,34 @@ output: revealjs::revealjs_presentation
 
 ---
 
+## 权限管理: root vs user
+
+> 权力越大，责任越大 (With great power comes great responsibility)
+
+- **root (超级用户)**: 系统的神，拥有无限权力 (慎用!)
+- **普通用户**: 权限受限，日常操作默认身份
+- **提权机制**:
+  - **`su <user>`**: 切换身份 (Switch User)。单独用 `su` 默认切到 root (需密码)
+  - **`sudo <command>`**: 临时以 root 权限执行命令 (SuperUser DO)
+
+---
+
+![](images/use_root_with_sudo.png)
+
+---
+
+## WSL 最佳实践: 权限篇
+
+1. **默认用户**: 安装后初始化时，**务必**创建一个普通用户，不要直接用 root 登录
+   - 避免误操作损坏系统文件
+2. **最小权限原则**:
+   - 日常开发 (编译、运行代码): **普通用户**
+   - 系统管理 (安装软件、修改配置): **`sudo apt install ...`**
+3. **设置默认用户** (如果误设为 root):
+   - PowerShell: `ubuntu config --default-user <username>`
+
+---
+
 # Topic 2: SSH 远程连接艺术
 
 ---
