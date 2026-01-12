@@ -36,7 +36,6 @@ mkdir -p "$OUTPUT_DIR"
 
 cp -a "$PROJECT_ROOT/courseware" "$OUTPUT_DIR/"
 cp -a "$PROJECT_ROOT/css" "$OUTPUT_DIR/"
-cp -a "$PROJECT_ROOT/refs" "$OUTPUT_DIR/"
 cp -a "$REVEALJS_PATH" "$OUTPUT_DIR/"
 
 touch "$OUTPUT_DIR/.nojekyll"

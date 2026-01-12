@@ -40,6 +40,18 @@ sudo fdisk -l
 
 ---
 
+## 常见目录
+
+```bash
+man hier
+```
+
+---
+
+![](images/hier.png)
+
+---
+
 ## 格式化 (Format)
 
 创建文件系统 (Filesystem) 的过程。
