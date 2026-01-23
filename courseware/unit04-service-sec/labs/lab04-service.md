@@ -24,7 +24,7 @@
 
 ### 任务 B: 谁在敲门？(日志分析)
 
-1. 查看共享服务器的 `/var/log/auth.log` (如果无权查看，请使用老师提供的脱敏日志样本)。
+1. 下载并查看脱敏的 SSH 日志样本：[auth.log](assets/auth.log)。
 2. 使用 `grep` 和 `awk` 统计最近 1000 条登录失败记录中，来源 IP 排名前 5 的地址。
    ```bash
    grep "Failed password" auth.log | ...

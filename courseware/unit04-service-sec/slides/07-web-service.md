@@ -62,14 +62,3 @@ server {
 1. **$remote_addr**: 谁在访问？
 2. **$status**: 200(OK), 404(Not Found), 500(Server Error)。
 3. **$request_time**: 响应慢吗？(需自定义配置)
-
----
-
-# 任务 07: 部署你的个人主页
-
-1. **后端**: 用 Python 启动一个最简单的 HTTP 服务。
-   `python3 -m http.server 8000`
-2. **代理**: 配置 Nginx (或 Caddy) 反向代理到 8000 端口。
-3. **验证**:
-   - 访问 Nginx 端口，看到 Python 服务的内容。
-   - 查看 Nginx 日志，确认请求被转发。

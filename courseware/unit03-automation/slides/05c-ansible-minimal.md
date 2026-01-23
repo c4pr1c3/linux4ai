@@ -80,14 +80,3 @@ ansible webservers -m copy -a "src=./index.html dest=/tmp/" -i hosts.ini
         state: started
         enabled: yes
 ```
-
----
-
-# 任务 06: 你的第一个 Playbook
-
-1. 在本地 WSL 安装 Ansible。
-2. 编写 Inventory，将 **共享服务器** 定义为目标主机。
-3. 编写 Playbook：
-   - 在你的家目录下创建一个文件夹 `ansible_demo`。
-   - 使用 `copy` 模块上传一个 `README.txt`。
-   - 使用 `cron` 模块为你自己添加一个定时任务（每分钟 echo hello）。

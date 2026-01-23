@@ -56,14 +56,3 @@ journalctl -f
 2. **测试解析**: `dig google.com` 或 `nslookup google.com`
 3. **systemd-resolved**: 
    - `resolvectl status`
-
----
-
-# 任务 04: 故障取证
-
-服务器发生了一次“服务中断”演习。请根据日志回答：
-
-1. 服务 `fake-web` 何时崩溃的？(journalctl)
-2. 崩溃时的错误堆栈是什么？
-3. 当时系统的负载情况如何？(SAR 或 dmesg 线索)
-4. 提交一份简短的《故障分析报告 (RCA)》。

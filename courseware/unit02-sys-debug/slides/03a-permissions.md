@@ -97,12 +97,3 @@ setfacl -x u:student02 my_file
    - 代替 netstat
    - `ss -lnt`: 监听中的 TCP 端口
 4. **nslookup / dig**: DNS 解析
-
----
-
-# 任务 03: 权限逃脱
-
-在 `/tmp/challenge` 目录下：
-1. 创建一个只有你自己能写，别人只能读的目录。
-2. 在其中创建一个文件，使用 ACL 授权给你的同桌（指定 UID）只读权限。
-3. 尝试删除别人创建的设置了 Sticky Bit 目录下的文件，观察报错。

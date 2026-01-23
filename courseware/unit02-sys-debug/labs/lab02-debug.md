@@ -54,7 +54,7 @@
 ## 3. 提交要求
 
 提交 `lab02/report.md`：
-1. **任务 A**: `ls -l` 和 `getfacl` 的截图/文本输出。
+1. **任务 A**: `ls -l` 和 `getfacl` 的截图/文本输出；Sticky Bit 的设置命令。
 2. **任务 B**: 完整的排障命令流（Command History）。
 3. **任务 C**: 提取的一条完整 cron 日志记录。
 4. **操作录屏**: asciinema 录屏转存文件 `.cast`（建议命名 `lab02/lab02.cast`，便于后续转为 text 进行智能批改）。

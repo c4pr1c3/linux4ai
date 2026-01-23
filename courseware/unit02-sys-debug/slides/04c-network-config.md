@@ -104,13 +104,3 @@ route -n
   ```bash
   resolvectl status
   ```
-
----
-
-# 任务 04b: 网络配置挑战
-
-1. 使用 `ip addr` 查看当前 IP
-2. 备份现有的 Netplan 配置文件
-3. 将你的虚拟机配置为**静态 IP** (确保在同一网段，不要冲突)
-4. 设置 DNS 为 `223.5.5.5` (阿里 DNS)
-5. `netplan apply` 生效并验证联网 (`ping baidu.com`)
