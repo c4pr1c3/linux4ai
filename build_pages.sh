@@ -153,11 +153,26 @@ for file in "${LAB_MD_FILES[@]}"; do
     --metadata title="$title"
 done
 
+# Process syllabus.md
+if [ -f "$PROJECT_ROOT/syllabus.md" ]; then
+  echo "Processing syllabus.md..."
+  output_file="$OUTPUT_DIR/syllabus.html"
+  
+  # Markmap headers
+  MARKMAP_HEADER='<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script><style>.markmap > svg { width: 100%; height: 100%; min-height: 500px; }</style>'
+  
+  pandoc -s -o "$output_file" "$PROJECT_ROOT/syllabus.md" \
+    --css="css/linux4ai.css" \
+    --variable header-includes="$MARKMAP_HEADER" \
+    --metadata title="Linux4AI Syllabus"
+fi
+
 {
   echo '<!doctype html>'
   echo '<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
   echo '<title>Linux4AI</title></head><body>'
   echo '<h1>Linux4AI</h1>'
+  echo '<p><a href="syllabus.html">课程大纲 (Syllabus)</a></p>'
   echo '<h2>Slides</h2>'
   echo '<ul>'
   for file in "${SLIDE_MD_FILES[@]}"; do
