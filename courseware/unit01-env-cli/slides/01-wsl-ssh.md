@@ -12,7 +12,7 @@ output: revealjs::revealjs_presentation
 
 ## 为什么是 Linux?
 
-- **服务器事实标准**: 全球 96.3% 的 Top 1M 服务器运行 Linux
+- **服务器事实标准**: 绝大多数互联网服务器运行 Linux
 - **云原生基石**: Docker, Kubernetes, DevOps 工具链
 - **AI 基础设施**: PyTorch, TensorFlow, CUDA 训练环境
 
@@ -102,7 +102,7 @@ output: revealjs::revealjs_presentation
    - 私钥 (`id_ed25519`): **绝对保密**，留在本地
    - 公钥 (`id_ed25519.pub`): **公开**，放到服务器
 2. **分发公钥**: `ssh-copy-id user@host`
-3. **连接**: 服务器用公钥加密挑战，客户端用私钥解密验证
+3. **连接**: 服务器发起挑战，客户端用私钥签名响应，服务器用公钥验签
 
 ---
 

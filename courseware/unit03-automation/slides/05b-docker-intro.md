@@ -74,7 +74,7 @@ docker rm my-nginx
 ## 使用镜像加速器
 
 - 从 Docker Hub 拉取镜像时，可能会遇到网络问题。
-- 可以使用镜像加速器 (如 DaoCloud) 来加速拉取。
+- 可以使用镜像加速器来加速拉取，但要明确其信任边界（避免把生产/敏感环境指向不可信源）。
 
 ---
 
@@ -93,7 +93,7 @@ docker rm my-nginx
 docker logs -f my-nginx
 
 # 进入容器内部 Shell
-docker exec -it my-nginx bash
+docker exec -it my-nginx sh
 
 # 查看容器详细信息
 docker inspect my-nginx

@@ -68,11 +68,11 @@ ls -l | awk '{sum += $5} END {print sum}'
 ```bash
 # 统计访问量最高的 Top 5 IP
 cat access.log \
-  | awk '{print $1}' \    # 提取 IP
-  | sort \                # 排序 (uniq 前必须排序)
-  | uniq -c \             # 去重并计数
-  | sort -nr \            # 按数字(n)倒序(r)排列
-  | head -n 5             # 取前 5
+  | awk '{print $1}' \
+  | sort \
+  | uniq -c \
+  | sort -nr \
+  | head -n 5
 ```
 
 ---
