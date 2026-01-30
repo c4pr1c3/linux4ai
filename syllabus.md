@@ -65,54 +65,36 @@ Linux 在服务器、云原生与安全运维领域具有事实标准地位。�
 
 ### 第一单元：环境构建与 CLI 生存指南（4学时）
 
-*   **WSL, SSH & 远程开发**：
-    *   [课件：WSL, SSH & 远程开发](courseware/unit01-env-cli/slides/01-wsl-ssh.md)
-*   **命令行的艺术与技术**：
-    *   [课件：命令行的艺术与技术](courseware/unit01-env-cli/slides/02a-cli-survival.md)
-*   **软件包管理艺术与技术**：
-    *   [课件：软件包管理艺术与技术](courseware/unit01-env-cli/slides/02b-package-mgmt.md)
+*   [WSL, SSH & 远程开发](courseware/unit01-env-cli/slides/01-wsl-ssh.md)：WSL2, Linux 发行版, 权限管理(root/sudo), SSH 密钥认证
+*   [命令行的艺术与技术](courseware/unit01-env-cli/slides/02a-cli-survival.md)：Shell, 管道/重定向, grep/awk, find, xargs
+*   [软件包管理艺术与技术](courseware/unit01-env-cli/slides/02b-package-mgmt.md)：apt/dpkg, 镜像源配置, 依赖管理, 软件安装与卸载
 
 ### 第二单元：系统运维与排障（4学时）
 
-*   **权限, 访问控制列表 & 文件系统结构**：
-    *   [课件：权限, 访问控制列表 & 文件系统结构](courseware/unit02-sys-debug/slides/03a-permissions.md)
-*   **用户与权限管理**：
-    *   [课件：用户与权限管理](courseware/unit02-sys-debug/slides/03b-user-admin.md)
-*   **系统可观测性 & 故障排查**：
-    *   [课件：系统可观测性 & 故障排查](courseware/unit02-sys-debug/slides/04a-process-debug.md)
-*   **存储管理基础**：
-    *   [课件：存储管理基础](courseware/unit02-sys-debug/slides/04b-storage.md)
-*   **网络配置管理**：
-    *   [课件：网络配置管理](courseware/unit02-sys-debug/slides/04c-network-config.md)
+*   [权限, 访问控制列表 & 文件系统结构](courseware/unit02-sys-debug/slides/03a-permissions.md)：UGO 权限模型, ACL, umask, 目录权限
+*   [用户与权限管理](courseware/unit02-sys-debug/slides/03b-user-admin.md)：/etc/passwd, useradd/usermod, sudoers, 最小权限原则
+*   [系统可观测性 & 故障排查](courseware/unit02-sys-debug/slides/04a-process-debug.md)：journalctl, ps/top, kill 信号, ss/netstat, 故障排查
+*   [存储管理基础](courseware/unit02-sys-debug/slides/04b-storage.md)：分区(fdisk/gdisk), 格式化(mkfs), 挂载(mount), /etc/fstab, LVM
+*   [网络配置管理](courseware/unit02-sys-debug/slides/04c-network-config.md)：iproute2, Netplan, DNS, 路由表
 
 ### 第三单元：自动化与可复现（4学时）
 
-*   **脚本编程: 从单行脚本到生产级**：
-    *   [课件：脚本编程: 从单行脚本到生产级](courseware/unit03-automation/slides/05a-shell-scripting.md)
-*   **Docker 容器技术入门**：
-    *   [课件：Docker 容器技术入门](courseware/unit03-automation/slides/05b-docker-intro.md)
-*   **代码即基础设施：Ansible 基础**：
-    *   [课件：代码即基础设施：Ansible 基础](courseware/unit03-automation/slides/05c-ansible-minimal.md)
+*   [脚本编程: 从单行脚本到生产级](courseware/unit03-automation/slides/05a-shell-scripting.md)：Shell 脚本, set -euo pipefail, 幂等性, 模块化
+*   [Docker 容器技术入门](courseware/unit03-automation/slides/05b-docker-intro.md)：容器 vs 虚拟机, Image/Container, docker run/exec, 镜像加速
+*   [代码即基础设施：Ansible 基础](courseware/unit03-automation/slides/05c-ansible-minimal.md)：IaC, 无 Agent, 幂等性, Inventory, Playbook
 
 ### 第四单元：服务交付与安全基线（4学时）
 
-*   **Nginx, 反向代理 & 日志**：
-    *   [课件：Nginx, 反向代理 & 日志](courseware/unit04-service-sec/slides/07-web-service.md)
-*   **安全基线 & AI 辅助运维**：
-    *   [课件：安全基线 & AI 辅助运维](courseware/unit04-service-sec/slides/08-security-ai.md)
+*   [Nginx, 反向代理 & 日志](courseware/unit04-service-sec/slides/07-web-service.md)：反向代理, 负载均衡, Nginx 配置, Access Log
+*   [安全基线 & AI 辅助运维](courseware/unit04-service-sec/slides/08-security-ai.md)：最小权限原则, SSH 加固, AI 辅助脚本审计, 幻觉风险
 
 ## 四、作业、实践环节
 
-*   **Lab 01: 环境构建与 CLI 初探**
-    *   [实验指导书](courseware/unit01-env-cli/labs/lab01-setup.md) ⭐️⭐️
-*   **Lab 02: 权限迷宫与系统排障**
-    *   [实验指导书](courseware/unit02-sys-debug/labs/lab02-debug.md) ⭐️⭐️⭐️
-*   **Lab 03: 自动化运维实战**
-    *   [实验指导书](courseware/unit03-automation/labs/lab03-automation.md) ⭐️⭐️⭐️⭐️
-*   **Lab 03b: Docker 容器实战**
-    *   [实验指导书](courseware/unit03-automation/labs/lab03b-docker.md) ⭐️⭐️⭐️
-*   **Lab 04: 服务交付与安全审计**
-    *   [实验指导书](courseware/unit04-service-sec/labs/lab04-service.md) ⭐️⭐️⭐️⭐️⭐️
+*   [Lab 01: 环境构建与 CLI 初探](courseware/unit01-env-cli/labs/lab01-setup.md) ⭐️⭐️
+*   [Lab 02: 权限迷宫与系统排障](courseware/unit02-sys-debug/labs/lab02-debug.md) ⭐️⭐️⭐️
+*   [Lab 03: 自动化运维实战](courseware/unit03-automation/labs/lab03-automation.md) ⭐️⭐️⭐️⭐️
+*   [Lab 03b: Docker 容器实战](courseware/unit03-automation/labs/lab03b-docker.md) ⭐️⭐️⭐️
+*   [Lab 04: 服务交付与安全审计](courseware/unit04-service-sec/labs/lab04-service.md) ⭐️⭐️⭐️⭐️⭐️
 
 | **难度等级** | 说明                                                                   |
 | :--:         | --                                                                     |

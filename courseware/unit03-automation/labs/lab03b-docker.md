@@ -31,65 +31,74 @@
 ## 任务 2: 构建 Python Web 应用
 
 1.  **准备代码**:
-    创建目录 `docker-lab`，并在其中创建 `app.py`:
-    ```python
-    from flask import Flask
-    import os
 
-    app = Flask(__name__)
+创建目录 `docker-lab`，并在其中创建 `app.py`:
 
-    @app.route('/')
-    def hello():
-        return f"Hello from Container! Hostname: {os.environ.get('HOSTNAME')}"
+```python
+from flask import Flask
+import os
 
-    if __name__ == '__main__':
-        app.run(host='0.0.0.0', port=5000)
-    ```
-    创建 `requirements.txt`:
-    ```plaintext
-    flask
-    ```
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    return f"Hello from Container! Hostname: {os.environ.get('HOSTNAME')}"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+创建 `requirements.txt`:
+
+```plaintext
+flask
+```
 
 2.  **编写 Dockerfile**:
     在同一目录下创建 `Dockerfile`:
-    ```dockerfile
-    FROM python:3.9-slim
-    WORKDIR /app
-    COPY requirements.txt .
-    RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-    COPY app.py .
-    CMD ["python", "app.py"]
-    ```
+
+```dockerfile
+FROM python:3.9-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+COPY app.py .
+CMD ["python", "app.py"]
+```
 
 3.  **构建镜像**:
-    ```bash
-    docker build -t my-flask-app:v1 .
-    ```
+
+```bash
+docker build -t my-flask-app:v1 .
+```
 
 4.  **运行并验证**:
-    ```bash
-    docker run -d -p 5000:5000 my-flask-app:v1
-    curl http://localhost:5000
-    ```
+
+```bash
+docker run -d -p 5000:5000 my-flask-app:v1
+curl http://localhost:5000
+```
 
 ## 任务 3: 数据持久化
 
 1.  **创建挂载目录**:
-    ```bash
-    mkdir -p ~/html
-    echo "<h1>Custom Home Page</h1>" > ~/html/index.html
-    ```
+
+```bash
+mkdir -p ~/html
+echo "<h1>Custom Home Page</h1>" > ~/html/index.html
+```
 
 2.  **挂载运行 Nginx**:
-    ```bash
-    docker run -d -p 8081:80 -v ~/html:/usr/share/nginx/html nginx:alpine
-    ```
+
+```bash
+docker run -d -p 8081:80 -v ~/html:/usr/share/nginx/html nginx:alpine
+```
 
 3.  **验证**: 访问 `http://localhost:8081`，应看到 "Custom Home Page"。
 
 ## 提交物
 
 提交 `lab03b/report.md`：
+
 1. **任务 2**: `curl` 命令的输出结果截图。
 2. **任务 3**: 浏览器访问 `http://localhost:8081` 的页面截图。
 3. **操作录屏**: asciinema 录屏转存文件 `.cast`（建议命名 `lab03b/lab03b.cast`，便于后续转为 text 进行智能批改）。录屏应包含 Docker 镜像构建、容器运行和验证的全过程。

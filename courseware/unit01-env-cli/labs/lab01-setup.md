@@ -67,6 +67,7 @@
 ## 4. 提交要求
 
 在你的 Git 仓库中创建 `lab01/report.md`，包含：
+
 1. **环境截图**: 展示 VS Code 连接到 WSL 或 SSH 的状态栏截图。
 2. **SSH Config**: 你的 `~/.ssh/config` 内容（**注意打码 IP 和敏感信息**）。
 3. **巡检录屏**: asciinema 的分享链接 + 对应的 `.cast` 录屏转存文件（例如 `lab01/lab01_check.cast`，便于后续转为 text 进行智能批改）。

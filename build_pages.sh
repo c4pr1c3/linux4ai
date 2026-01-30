@@ -36,6 +36,9 @@ mkdir -p "$OUTPUT_DIR"
 
 cp -a "$PROJECT_ROOT/courseware" "$OUTPUT_DIR/"
 cp -a "$PROJECT_ROOT/css" "$OUTPUT_DIR/"
+if [ -d "$PROJECT_ROOT/js" ]; then
+  cp -a "$PROJECT_ROOT/js" "$OUTPUT_DIR/"
+fi
 cp -a "$REVEALJS_PATH" "$OUTPUT_DIR/"
 
 touch "$OUTPUT_DIR/.nojekyll"
@@ -146,11 +149,17 @@ for file in "${LAB_MD_FILES[@]}"; do
 
   rel_path_to_output_root="$(realpath --relative-to="$output_dir" "$OUTPUT_DIR")"
   css_url="$rel_path_to_output_root/css/linux4ai.css"
+  js_url="$rel_path_to_output_root/js/toc.js"
   title="$(extract_first_h1_title "$file")"
 
   pandoc -s -o "$output_file" "$file" \
     --css="$css_url" \
+    --toc \
     --metadata title="$title"
+
+  # Add markdown-body class to body and inject TOC script
+  sed -i 's/<body>/<body class="markdown-body">/' "$output_file"
+  sed -i "s|</body>|<script src=\"$js_url\"></script></body>|" "$output_file"
 done
 
 # Process syllabus.md
@@ -163,8 +172,13 @@ if [ -f "$PROJECT_ROOT/syllabus.md" ]; then
   
   pandoc -s -o "$output_file" "$PROJECT_ROOT/syllabus.md" \
     --css="css/linux4ai.css" \
+    --toc \
     --variable header-includes="$MARKMAP_HEADER" \
     --metadata title="Linux4AI Syllabus"
+
+  # Add markdown-body class to body and inject TOC script
+  sed -i 's/<body>/<body class="markdown-body">/' "$output_file"
+  sed -i 's|</body>|<script src="js/toc.js"></script></body>|' "$output_file"
 fi
 
 {

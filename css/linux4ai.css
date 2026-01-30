@@ -205,27 +205,37 @@
 }
 
 .markdown-body table {
-    display: block;
+    display: table;
     width: 100%;
-    overflow: auto;
-    border-spacing: 0;
     border-collapse: collapse;
     margin-top: 0;
     margin-bottom: 16px;
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
 }
 
-.markdown-body table th, .markdown-body table td {
-    padding: 6px 13px;
-    border: 1px solid #dfe2e5;
+.markdown-body table th {
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 1px solid #000;
+    font-weight: bold;
+    background-color: #f0f0f0;
+    text-align: left;
+}
+
+.markdown-body table td {
+    padding: 8px 12px;
+    border: none;
+    text-align: left;
 }
 
 .markdown-body table tr {
     background-color: #fff;
-    border-top: 1px solid #c6cbd1;
+    border: none;
 }
 
-.markdown-body table tr:nth-child(2n) {
-    background-color: #f6f8fa;
+.markdown-body table tr:nth-child(even) {
+    background-color: #f8f9fa;
 }
 
 .markdown-body code {
@@ -273,4 +283,84 @@
     box-sizing: content-box;
     background-color: #fff;
 }
+
+/* TOC Navigation Styles */
+#TOC {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 250px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#TOC.collapsed {
+    width: 60px;
+    height: 40px;
+    overflow: hidden;
+    padding: 5px;
+}
+
+#TOC.collapsed > ul {
+    display: none;
+}
+
+#toc-toggle {
+    display: block;
+    width: 100%;
+    background: #f6f8fa;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+    padding: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #24292e;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#TOC.collapsed #toc-toggle {
+    margin-bottom: 0;
+    border: none;
+    background: transparent;
+    padding: 0;
+    height: 100%;
+}
+
+#TOC ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#TOC ul ul {
+    padding-left: 15px;
+}
+
+#TOC a {
+    display: block;
+    padding: 4px 0;
+    color: #0366d6;
+    text-decoration: none;
+    word-wrap: break-word;
+}
+
+#TOC a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 1100px) {
+    #TOC {
+        background: rgba(255,255,255,0.95);
+    }
+}
+
 

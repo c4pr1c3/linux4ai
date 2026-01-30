@@ -54,6 +54,7 @@
 ## 3. 提交要求
 
 提交 `lab02/report.md`：
+
 1. **任务 A**: `ls -l` 和 `getfacl` 的截图/文本输出；关键 `chmod`/`setfacl` 命令。
 2. **任务 B**: 完整的排障命令流（Command History）。
 3. **任务 C**: 提取的一条完整 cron 日志记录。
