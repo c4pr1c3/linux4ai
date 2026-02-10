@@ -63,6 +63,10 @@ Linux 在服务器、云原生与安全运维领域具有事实标准地位。�
 ```
 
 
+### 第零单元：Linux 概论（自学）
+
+*   [Linux 概论](courseware/unit00-intro/slides/00-intro2linux.md)：AI 时代的 Linux, 历史与哲学, 发行版(Ubuntu/LTS), CLI 价值
+
 ### 第一单元：环境构建与 CLI 生存指南（4学时）
 
 *   [WSL, SSH & 远程开发](courseware/unit01-env-cli/slides/01-wsl-ssh.md)：WSL2, Linux 发行版, 权限管理(root/sudo), SSH 密钥认证
