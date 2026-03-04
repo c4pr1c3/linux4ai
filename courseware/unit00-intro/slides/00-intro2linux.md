@@ -22,7 +22,7 @@ output: revealjs::revealjs_presentation
 
 - **AI 的幻觉**: AI 是概率模型，可能生成 `rm -rf /` 这样看似合理但危险的命令。
 - **确定性基石**: Linux 是确定性系统。你需要具备**审计**能力，才能安全驾驶。
-- **案例**: AI 建议的防火墙规则可能是错误的，只有懂网络栈的人才能发现并修正。
+- **案例**: AI 建议的防火墙规则可能是错误的（如直接阻断 SSH 22 端口导致失联），只有懂网络栈的人才能发现并修正。
 
 ---
 
@@ -70,7 +70,7 @@ output: revealjs::revealjs_presentation
 
 ## Linux 哲学
 
-1.  **Everything is a file**: 硬盘、键盘、屏幕、网络连接，都是文件。
+1. - **Everything is a file**: 硬盘、键盘、屏幕、网络连接，都是文件。(注意路径分隔符：Linux 使用正斜杠 `/`，Windows 使用反斜杠 `\`)
 2.  **Keep It Simple and Stupid (KISS)**: 每个工具只做一件事，并把它做好 (ls, grep, awk)。
 3.  **Pipe (管道)**: 组合简单工具完成复杂任务 (`|`)。
 
@@ -124,7 +124,7 @@ output: revealjs::revealjs_presentation
 
 - **Namespace & Cgroups**: Linux 内核特性。
 - **Sealed Glass Box**: 互不干扰，但共享内核 (Kernel) 和硬件(Hardware)。
-- **Docker**: 就是在这个机制上构建的标准化交付工具。
+- **Docker**: 就是在这个机制上构建的标准化交付工具。(Podman 是无守护进程的更安全替代品，但 Docker 依然是事实标准)
 
 ---
 
@@ -145,7 +145,7 @@ output: revealjs::revealjs_presentation
     - `htop` 显示系统资源
     -`nvtop` 监控 GPU
     - `tmux` 终端会话管理
-    - `claude code` 代码智能体
+    - `claude code` 代码智能体 (底层驱动多为 Bash 脚本与标准 Linux 工具)
 
 
 

@@ -51,6 +51,42 @@ output: revealjs::revealjs_presentation
   - 秒级启动
   - 与 VS Code 无缝集成
   - 直接调用 Windows 进程 (如 `explorer.exe .`)
+  - **互操作性**: Linux 下通过 `/mnt/c/` 访问 Windows C 盘文件
+
+---
+
+## Windows 终端基础
+
+> 工欲善其事，必先利其器
+
+- **PowerShell vs CMD**:
+  - **CMD (命令提示符)**: 古老遗留产物，功能受限，**不推荐使用**。
+  - **PowerShell**: 现代 Windows 首选终端，支持别名与脚本。
+- **输入法陷阱**:
+  - **全角符号**: 中文输入法下的 `。` `－` 会导致命令报错。
+  - **习惯**: 敲命令前**务必**切换为英文输入法。
+- **路径分隔符**:
+  - Windows: `C:\Windows\System32` (反斜杠 `\`, 邪道)
+  - Linux/Web: `/home/user` (正斜杠 `/`, 正道)
+
+---
+
+## Windows Terminal vs PowerShell
+
+> 很多初学者容易混淆这两个概念
+
+- **Windows Terminal (终端)**: 
+  - **角色**: 载体/容器 (就像浏览器 Chrome/Edge)
+  - **功能**: 负责显示窗口、标签页、字体渲染、多窗口管理
+  - **特点**: 可以同时打开 PowerShell, CMD, WSL (Ubuntu) 等多个标签页
+- **PowerShell (Shell)**: 
+  - **角色**: 解释器/引擎 (就像网页引擎 JavaScript)
+  - **功能**: 负责解析你输入的命令并执行，返回结果
+  - **关系**: Windows Terminal 运行着 PowerShell
+
+---
+
+![](images/cmd-vs-powershell.png)
 
 ---
 
@@ -58,8 +94,9 @@ output: revealjs::revealjs_presentation
 
 > 权力越大，责任越大 (With great power comes great responsibility)
 
-- **root (超级用户)**: 系统的神，拥有无限权力 (慎用!)
-- **普通用户**: 权限受限，日常操作默认身份
+- **root (超级用户)**: 系统的神，拥有无限权力 (慎用!)。`id` 显示 `uid=0`。
+- **普通用户**: 权限受限，日常操作默认身份。`id` 显示 `uid=1000+`。
+- **进程视图**: `ps aux` 在本地 (WSL) 可见所有进程，在本课程搭建提供的共享服务器 (多用户) 仅可见自己进程。
 - **提权机制**:
   - **`su <user>`**: 切换身份 (Switch User)。单独用 `su` 默认切到 root (需密码)
   - **`sudo <command>`**: 临时以 root 权限执行命令 (SuperUser DO)
@@ -99,6 +136,7 @@ output: revealjs::revealjs_presentation
 ## 密钥认证原理
 
 1. **生成密钥对**: `ssh-keygen -t ed25519 -C "your_email"`
+   - 推荐 `ed25519`: 椭圆曲线算法，比 RSA 更安全且性能更好
    - 私钥 (`id_ed25519`): **绝对保密**，留在本地
    - 公钥 (`id_ed25519.pub`): **公开**，放到服务器
 2. **分发公钥**: `ssh-copy-id user@host`
