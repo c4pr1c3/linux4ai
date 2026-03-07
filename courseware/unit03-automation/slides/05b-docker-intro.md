@@ -40,8 +40,9 @@ output: revealjs::revealjs_presentation
     - 类比: 软件安装包 / ISO 镜像
 2.  **Container (容器)**: 镜像的运行实例，可读写。
     - 类比: 运行中的进程
-3.  **Registry (仓库)**: 存储镜像的地方 (如 Docker Hub)。
-    - 类比: GitHub / Maven Central
+3.  **Registry (镜像仓库)**: 存储 Docker 镜像的地方（如 Docker Hub）。
+    - 类比: GitHub（存储代码） vs Docker Hub（存储镜像）
+    - 注意：与软件包管理中的"软件源"、Git 中的"代码仓库"不同
 
 ---
 

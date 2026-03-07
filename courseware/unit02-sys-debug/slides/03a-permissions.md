@@ -39,7 +39,9 @@ drwxr-xr-x 2 student01 student01 4096 Jan 12 10:00 my_project
 
 ---
 
-## ACL: 超越 UGO 的细粒度控制
+## ACL (访问控制列表): 超越 UGO 的细粒度控制
+
+> **ACL (Access Control List)**: 访问控制列表，提供比 UGO 更灵活的权限控制
 
 当各组无法满足需求时（例如：想给特定同学 student02 读权限，但不给其他人）：
 

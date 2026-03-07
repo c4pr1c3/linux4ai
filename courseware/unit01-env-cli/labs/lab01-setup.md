@@ -55,7 +55,7 @@
 
 ### 任务 D: 日志取证 (Log Forensics)
 
-假设你截获了一份服务器访问日志 [access.log](assets/access.log) (点击下载或在仓库中查看)。
+假设你截获了一份服务器访问日志 [access.log](assets/access.log)（点击下载或在课程代码仓库中查看）。
 
 请使用 `grep`, `awk`, `sort`, `uniq` 等工具分析日志，回答以下问题：
 1. **攻击者 IP**: 哪个 IP 地址发起了疑似攻击（SQL 注入、敏感文件扫描）？

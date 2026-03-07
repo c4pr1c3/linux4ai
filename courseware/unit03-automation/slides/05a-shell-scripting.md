@@ -30,12 +30,12 @@ set -euo pipefail
 
 ```bash
 # 默认值
-NAME="${1:-World}"  # 如果 $1 为空，NAME="World"
+NAME="${1:-World}"  # 如果 $1 为空，则使用默认值 "World"
 
 # 字符串操作
 FILE="image.png"
-echo "${FILE%.*}"   # 输出 image (去后缀)
-echo "${FILE#*.}"   # 输出 png (去前缀)
+echo "${FILE%.*}"   # 输出 image (去掉后缀)
+echo "${FILE#*.}"   # 输出 png (去掉前缀)
 
 # 只读变量
 readonly VERSION="1.0.0"
@@ -73,22 +73,26 @@ fi
 ## 函数与模块化
 
 ```bash
+# 日志函数：记录带时间戳的日志
 log() {
     echo "[$(date +%F_%T)] $1"
 }
 
+# 检查是否以 root 权限运行
 check_root() {
     if [[ $EUID -ne 0 ]]; then
-       log "Error: Must be run as root" >&2
+       log "错误: 必须以 root 用户运行" >&2
        exit 1
     fi
 }
 
+# 主函数
 main() {
     check_root
-    log "Starting update..."
+    log "开始更新系统..."
     apt update && apt upgrade -y
 }
 
+# 执行主函数，传入所有参数
 main "$@"
 ```

@@ -13,7 +13,7 @@ output: revealjs::revealjs_presentation
 ## 为什么需要包管理器?
 
 - **解决依赖地狱**: 自动处理库文件依赖 (`libssl`, `libc`...)
-- **统一分发渠道**: 安全、签名、官方维护的仓库
+- **统一分发渠道**: 安全、签名、官方维护的**软件源**
 - **版本控制**: 轻松升级、回滚、保持系统更新
 - **对比 Windows**: 类似 App Store vs 也就是到处下载 `.exe`
 
@@ -23,7 +23,7 @@ output: revealjs::revealjs_presentation
 
 - **dpkg**: 底层工具，处理 `.deb` 文件 (类似 `.rpm`)
 - **apt (Advanced Package Tool)**: 上层前端，处理依赖、下载 (类似 `yum`/`dnf`)
-- **Repository (软件源)**: 存放软件包的服务器
+- **软件源 (Repository)**: 存放软件包的服务器（注意：与 Git 代码仓库、Docker 镜像仓库不同）
 
 ---
 
@@ -81,8 +81,8 @@ deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted
 ...
 ```
 
-- **deb**: 二进制包仓库
-- **deb-src**: 源代码包仓库
+- **deb**: 二进制软件源
+- **deb-src**: 源代码软件源
 - **URL**: 镜像地址 (如阿里云、清华源)
 - **Codename**: 发行版代号 (如 `jammy` 对应 22.04)
 - **Component**: `main` (官方支持), `restricted` (专有驱动), `universe` (社区), `multiverse` (非自由)
