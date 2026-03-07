@@ -19,6 +19,8 @@ Linux 在服务器、云原生与安全运维领域具有事实标准地位。�
 
 通过本课程学习，使学生掌握基于 Linux 操作系统进行环境搭建、系统管理、网络配置、服务交付、自动化运维与安全加固的相关知识与技能，为网络系统管理、云计算与安全工程实践打下基础。
 
+同时，培养学生具备 Linux 生态环境下的**"快速学习和持续学习"**能力，理解 Linux 设计哲学，掌握官方文档阅读方法和 AI 辅助学习技能，以适应未来的工具变化和技术发展。
+
 ## 三、教学内容与学时分配
 
 ### 课程知识图谱
@@ -91,6 +93,14 @@ Linux 在服务器、云原生与安全运维领域具有事实标准地位。�
 
 *   [Nginx, 反向代理 & 日志](courseware/unit04-service-sec/slides/07-web-service.md)：反向代理, 负载均衡, Nginx 配置, Access Log
 *   [安全基线 & AI 辅助运维](courseware/unit04-service-sec/slides/08-security-ai.md)：最小权限原则, SSH 加固, AI 辅助脚本审计, 幻觉风险
+
+### 第五单元：Linux 设计理念与最佳实践（2学时）
+
+*   [Linux 设计理念与最佳实践](courseware/unit05-philosophy/slides/09-linux-philosophy.md)：设计哲学深入（一切皆文件、做好一件事、文本流）、工具链思想、系统编程接口概览、最佳实践系统化总结
+
+### 第六单元：持续学习与 AI 辅助（2学时）
+
+*   [持续学习与 AI 辅助](courseware/unit06-learning/slides/10-continuous-learning.md)：AI 时代的学习方法论、官方文档阅读能力、AI 辅助学习实践、持续学习资源和方法
 
 ## 四、作业、实践环节
 

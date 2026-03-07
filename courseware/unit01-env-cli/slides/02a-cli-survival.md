@@ -206,3 +206,132 @@ Vim 是**模态**编辑器，不同模式下按键含义不同：
 - **`<command> --help`**: 快速简要帮助
 - **tldr**: Too Long; Didn't Read (需安装)
   - `tldr tar` -> 只显示常用例子
+
+---
+
+## man pages 阅读技巧
+
+### man 文档结构
+
+```
+NAME        # 命令名称和简短描述
+SYNOPSIS    # 命令语法
+DESCRIPTION # 详细描述
+OPTIONS     # 选项说明
+EXAMPLES    # 使用示例
+FILES       # 相关文件
+SEE ALSO    # 相关命令
+BUGS        # 已知问题
+```
+
+---
+
+## 高效阅读技巧
+
+**1. 先看 NAME 和 SYNOPSIS**
+
+快速了解命令用途，理解基本语法
+
+**2. 再看 EXAMPLES**
+
+通过示例理解用法，复制示例到命令行测试
+
+**3. 遇到问题看 OPTIONS**
+
+按需查找选项说明，不需要记住所有选项
+
+**4. 最后看 DESCRIPTION**
+
+需要时深入理解细节
+
+---
+
+## man 的分类
+
+Linux 文档分为多个章节（section）：
+
+```bash
+man 1 ls        # 用户命令
+man 2 open      # 系统调用
+man 3 printf    # 库函数
+man 5 crontab   # 配置文件格式
+man 8 iptables  # 管理员命令
+```
+
+**默认**：显示第一个匹配的章节
+
+**指定章节**：`man 5 crontab`（查看配置文件格式，而非 crontab 命令）
+
+---
+
+## 查找相关文档
+
+```bash
+# 搜索包含关键词的所有 man 页
+man -k "copy"       # 等同于 apropos "copy"
+
+# 搜索命令的特定章节
+man -f crontab      # 等同于 whatis crontab
+```
+
+---
+
+## 现场演示：阅读陌生工具的文档
+
+### 案例：`strace` 工具
+
+**第一步：快速了解**
+
+```bash
+$ man strace
+
+# NAME 段落
+strace - trace system calls and signals
+
+# 快速了解：这是一个追踪系统调用的工具
+```
+
+---
+
+## 第二步：查看示例
+
+在 man 页内输入 `/EXAMPLES` 跳转到示例部分
+
+---
+
+## 第三步：理解常用选项
+
+```
+-p PID     # 追踪指定进程
+-f         # 追踪子进程
+-T         # 显示时间戳
+```
+
+---
+
+## 第四步：实际测试
+
+```bash
+# 复制示例命令测试
+strace ls
+
+# 追踪指定进程
+strace -p $PID
+```
+
+---
+
+## 其他文档资源
+
+```bash
+# info pages（更详细的文档）
+info coreutils
+info libc
+
+# 软件包文档目录
+ls /usr/share/doc/
+ls /usr/share/doc/*/examples/
+
+# 配置文件模板
+ls /etc/*.default/
+```
