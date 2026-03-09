@@ -51,6 +51,30 @@ sudo apt upgrade
 
 ---
 
+## 验证: 拒绝 AI 幻觉
+
+> AI 模型训练数据具有滞后性 (Cut-off date)，可能提供过时建议。即时使用了联网检索，也面临信息过载导致的错误理解。
+
+- **案例**: `asciinema` (AI 常推荐 Python 版，官方已迁移至 Rust)
+- **验证工具**: `apt policy <package>`
+  - 检查候选版本 (Candidate)
+  - 确认来源仓库 (Repository)
+- **原则**: **官方文档/仓库 README > AI 建议**
+
+---
+
+> 2026.3.9 案例
+
+![](images/asciinema-install-by-AI.png)
+
+---
+
+> 确认已安装版本
+
+![](images/asciinema-installed.png)
+
+---
+
 ## 清理与维护
 
 ```bash

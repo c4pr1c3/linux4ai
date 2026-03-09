@@ -12,8 +12,10 @@ output: revealjs::revealjs_presentation
 
 ## 为什么还要用命令行?
 
-- **可组合性**: 小工具通过管道 (`|`) 组合成大威力
-- **自动化**: 所有命令都可写入脚本
+- **AI 时代的一等公民**: 
+  - **可组合性**: 它是 AI Agent (如 Open Interpreter) 的原生接口
+  - **确定性**: 相比自然语言的概率模型，CLI 提供精确的执行边界
+- **自动化**: 所有命令都可写入脚本，构建 Agent 工作流
 - **远程友好**: 低带宽，无 GUI 依赖
 - **精确**: 图形界面隐藏细节，命令行暴露真相
 
@@ -29,6 +31,17 @@ output: revealjs::revealjs_presentation
   - `>`: 覆盖写入
   - `>>`: 追加写入
   - `2>`: 错误重定向
+
+---
+
+## 环境感知: 我是谁? 我在哪?
+
+> REPL (Read-Eval-Print Loop): 交互式环境不仅是执行命令，更是感知状态
+
+- **我是谁**: `id` (UID/GID), `whoami`
+- **我在哪**: `pwd`, `hostname`, `cat /etc/os-release`
+- **环境负载**: `w`, `uptime` (Load Average)
+- **解释器**: `echo $SHELL` (Bash vs Zsh 差异)
 
 ---
 
@@ -134,6 +147,18 @@ file -i data.csv                # 查看编码
 
 iconv -f GBK -t UTF-8 old.txt > new.txt
 ```
+
+---
+
+## 字节视角: 还原真相
+
+> **Don't trust your eyes, trust the bytes.**
+> 文本文件在二进制层面可能大相径庭 (如 CRLF vs LF)
+
+- **xxd**: 十六进制查看器 ("显微镜"模式)
+  - `xxd filename`: 查看文件的十六进制表示
+  - `xxd -r`: 逆向还原
+- **场景**: 排查 Windows 编辑的文件在 Linux 下的隐形字符问题
 
 ---
 
