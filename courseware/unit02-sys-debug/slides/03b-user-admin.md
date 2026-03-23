@@ -111,11 +111,4 @@ sudo visudo
 %wheel ALL=(ALL) NOPASSWD: ALL
 ```
 
----
 
-# 任务 03b: 账号管理实战
-
-1. 创建一个新用户 `devops`
-2. 赋予其 `sudo` 权限
-3. 切换到新用户验证权限
-4. 尝试修改其默认 Shell 为 `zsh` (需先安装 zsh)

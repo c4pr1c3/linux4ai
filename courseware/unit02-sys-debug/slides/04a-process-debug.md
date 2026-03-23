@@ -50,9 +50,9 @@ journalctl -f
 
 ## DNS 排障
 
-当 "ping 8.8.8.8 通，但 ping google.com 不通" 时：
+当 "ping 1.1.1.1 通，但 ping www.baidu.com 不通" 时：
 
 1. **查看配置**: `cat /etc/resolv.conf`
-2. **测试解析**: `dig google.com` 或 `nslookup google.com`
+2. **测试解析**: `dig www.baidu.com` 或 `nslookup www.baidu.com`
 3. **systemd-resolved**: 
    - `resolvectl status`

@@ -102,3 +102,4 @@ docker run -d -p 8081:80 -v ~/html:/usr/share/nginx/html nginx:alpine
 1. **任务 2**: `curl` 命令的输出结果截图。
 2. **任务 3**: 浏览器访问 `http://localhost:8081` 的页面截图。
 3. **操作录屏**: asciinema 录屏转存文件 `.cast`（建议命名 `lab03b/lab03b.cast`，便于后续转为 text 进行智能批改）。录屏应包含 Docker 镜像构建、容器运行和验证的全过程。
+4. **问题复盘**: 记录在配置过程中遇到的至少 1 个问题及解决方法。
