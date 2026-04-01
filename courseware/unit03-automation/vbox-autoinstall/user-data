@@ -1,0 +1,260 @@
+#cloud-config
+# ============================================================
+# Ubuntu 22.04 Server 无人值守自动安装配置（VirtualBox 双网卡）
+# 课程：Linux 系统与网络管理（网络空间安全专业）
+# ============================================================
+#
+# 使用方法：
+#   1. 编辑本文件中的【可自定义配置】区域（密码、SSH 公钥、镜像源等）
+#   2. 运行 create-cloudinit-iso.sh 生成 cidata ISO
+#   3. 在 VirtualBox 虚拟机中同时挂载 Ubuntu Server ISO 和 cidata ISO
+#   4. 启动虚拟机，安装过程将全自动完成
+#
+# 密码哈希生成方法（生产环境强烈推荐）：
+#   openssl passwd -6 '你的明文密码'
+#   或
+#   sudo apt install whois && mkpasswd -m sha-512 '你的明文密码'
+#
+# 文件结构说明：
+#   autoinstall 段 —— 由 Subiquity 安装器处理（系统安装阶段）
+#   user-data 段 —— 由 cloud-init 处理（首次启动阶段）
+# ============================================================
+
+autoinstall:
+  version: 1
+
+  # --- 区域与键盘 ---
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+    variant: ''
+
+  # --- 安装器自身更新（关闭以加速安装） ---
+  refresh-installer:
+    update: false
+
+  # --- 跳过硬件驱动搜索（加速安装：节省 1-2 分钟） ---
+  source:
+    search_drivers: false
+
+  # --- 跳过专有驱动和编解码器（服务器环境无需） ---
+  codecs:
+    install: false
+  drivers:
+    install: false
+
+  # --- 网络配置（VirtualBox 双网卡） ---
+  # enp0s3: NATNetwork 或 NAT，用于访问外网
+  # enp0s8: Host-Only，用于宿主机与虚拟机通信
+  # optional: true —— 网卡未就绪时不阻塞系统启动
+  # dhcp-identifier: mac —— 使用 MAC 作为 DHCP 标识，避免克隆 VM 的 IP 冲突
+  network:
+    network:
+      version: 2
+      ethernets:
+        enp0s3:
+          dhcp4: true
+          optional: true
+        enp0s8:
+          dhcp4: true
+          dhcp-identifier: mac
+          optional: true
+
+  # --- APT 镜像源（清华大学 TUNA） ---
+  apt:
+    primary:
+      - arches: [amd64, i386]
+        uri: http://mirrors.tuna.tsinghua.edu.cn/ubuntu
+      - arches: [default]
+        uri: http://mirrors.tuna.tsinghua.edu.cn/ubuntu
+
+  # --- 存储与分区（LVM + BIOS 引导，自适应磁盘大小） ---
+  # 引导模式：BIOS Legacy（GPT + bios_grub 分区）
+  # 分区布局：
+  #   BIOS boot   1MB      GRUB 兼容分区（GPT 磁盘必需）
+  #   /boot       1GB      内核与 initrd（ext4）
+  #   LVM PV      磁盘剩余空间  卷组 ubuntu-vg
+  #     root-lv   50%      根文件系统 /
+  #     home-lv   35%      用户家目录 /home（独立 LV）
+  #     swap-lv   8%       交换空间
+  #   卷组剩余约 7% 空间保留，便于后续扩展
+  # 注：百分比相对于 VG 可用空间计算，适配不同磁盘容量
+  #     UEFI 引导模式请使用 user-data_uefi
+  storage:
+    config:
+      # 整块磁盘
+      - id: disk-sda
+        type: disk
+        ptable: gpt
+        wipe: superblock-recursive
+        grub_device: true
+
+      # BIOS boot 分区（1MB，GPT 磁盘上 GRUB 需要）
+      - id: part-bios
+        type: partition
+        device: disk-sda
+        size: 1M
+        flag: bios_grub
+
+      # /boot 分区（1GB）
+      - id: part-boot
+        type: partition
+        device: disk-sda
+        size: 1G
+
+      # 格式化 /boot 为 ext4
+      - id: format-boot
+        type: format
+        volume: part-boot
+        fstype: ext4
+
+      # LVM 物理卷分区（磁盘剩余空间）
+      - id: part-lvm
+        type: partition
+        device: disk-sda
+        size: -1
+
+      # LVM 卷组
+      - id: vg-ubuntu
+        type: lvm_volgroup
+        name: ubuntu-vg
+        devices:
+          - part-lvm
+
+      # 根逻辑卷（VG 的 50%）
+      - id: lv-root
+        type: lvm_partition
+        volgroup: vg-ubuntu
+        name: root-lv
+        size: 50%
+
+      # 格式化根逻辑卷
+      - id: format-root
+        type: format
+        volume: lv-root
+        fstype: ext4
+
+      # 家目录逻辑卷（VG 的 35%）
+      - id: lv-home
+        type: lvm_partition
+        volgroup: vg-ubuntu
+        name: home-lv
+        size: 35%
+
+      # 格式化家目录逻辑卷
+      - id: format-home
+        type: format
+        volume: lv-home
+        fstype: ext4
+
+      # 交换逻辑卷（VG 的 8%）
+      - id: lv-swap
+        type: lvm_partition
+        volgroup: vg-ubuntu
+        name: swap-lv
+        size: 8%
+
+      # 格式化交换逻辑卷
+      - id: format-swap
+        type: format
+        volume: lv-swap
+        fstype: swap
+
+      # 挂载：根文件系统
+      - id: mount-root
+        type: mount
+        device: format-root
+        path: /
+
+      # 挂载：/boot
+      - id: mount-boot
+        type: mount
+        device: format-boot
+        path: /boot
+
+      # 挂载：/home
+      - id: mount-home
+        type: mount
+        device: format-home
+        path: /home
+
+  # --- 安装时创建的默认用户（ubuntu） ---
+  # 【可自定义配置】修改 hostname、username、password
+  identity:
+    hostname: linux4ai
+    realname: Ubuntu Server
+    username: ubuntu
+    # 默认密码：123456 的 SHA-512 哈希值
+    # 生成新哈希：openssl passwd -6 '你的密码'
+    password: "$6$jwf.7c1nQuVJ99Fe$PEVxP/VhtLecaBVJqAFuSjzA0Qai8ikfG81ECjapo7tSL/r0EnVzd2puGyk2fFAhIgOzMjZppRP6KZ/tvWqn30"
+
+  # --- SSH 服务 ---
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  # --- 安装阶段额外安装的软件包 ---
+  packages:
+    - openssh-server
+    - cloud-init
+    - python3
+
+  # --- 预配置软件包（避免安装过程中交互式提示） ---
+  debconf-selections: |
+    unattended-upgrades unattended-upgrades/enable_auto_updates boolean false
+
+  # --- 安装阶段执行的命令（late-commands，比首次启动 runcmd 更快） ---
+  late-commands:
+    # 重置 machine-id（克隆虚拟机必备）
+    - curtin in-target -- bash -c 'echo -n "" > /etc/machine-id'
+    - curtin in-target -- /bin/systemd-machine-id-setup
+    - curtin in-target -- rm -f /var/lib/dbus/machine-id
+    # 强制 NoCloud 数据源（跳过 AWS/Azure/OpenStack 探测，加速首次启动）
+    - |
+      curtin in-target -- bash -c 'echo "datasource_list: [NoCloud, None]" > /etc/cloud/cloud.cfg.d/99-enable-datasource.cfg'
+    # 清理 apt 缓存（减小磁盘占用）
+    - curtin in-target -- apt-get clean
+
+  # ============================================================
+  # 以下 user-data 段由 cloud-init 在首次启动时处理
+  # ============================================================
+  user-data:
+
+    # --- 时区 ---
+    timezone: Asia/Shanghai
+
+    # --- 加速首次启动：跳过 apt update/upgrade ---
+    package_update: false
+    package_upgrade: false
+
+    # --- 创建课程用户 cuc ---
+    # 【可自定义配置】修改用户名、密码、SSH 公钥
+    users:
+      - name: cuc
+        lock_passwd: false
+        # 默认密码：123456 的 SHA-512 哈希值（与 ubuntu 用户相同）
+        # 生成新哈希：openssl passwd -6 '你的密码'
+        passwd: "$6$jwf.7c1nQuVJ99Fe$PEVxP/VhtLecaBVJqAFuSjzA0Qai8ikfG81ECjapo7tSL/r0EnVzd2puGyk2fFAhIgOzMjZppRP6KZ/tvWqn30"
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        shell: /bin/bash
+        groups:
+          - adm
+          - sudo
+        # 【可自定义配置】替换为你的 SSH 公钥
+        # 方法 1：直接编辑本文件，取消注释并替换公钥内容
+        # 方法 2：运行构建脚本时使用 --ssh-key 参数自动注入
+        ssh_authorized_keys:
+          # - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user@host
+
+    # --- 首次启动后执行的命令（精简版，大部分已在 late-commands 完成） ---
+    runcmd:
+      - dbus-uuidgen --ensure=/etc/machine-id
+      - dbus-uuidgen --ensure
+
+    # --- 首次配置完成后自动重启（使新 machine-id 生效） ---
+    power_state:
+      delay: "now"
+      mode: reboot
+      message: "Cloud-init completed. Rebooting to apply new machine-id."
+      timeout: 10
+      condition: True

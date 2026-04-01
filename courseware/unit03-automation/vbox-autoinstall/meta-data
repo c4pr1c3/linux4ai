@@ -1,0 +1,4 @@
+# NoCloud 元数据
+# instance-id 变更会触发 cloud-init 重新执行（用于克隆虚拟机后重置配置）
+instance-id: linux4ai-vbox-001
+local-hostname: linux4ai.cuc
