@@ -140,3 +140,9 @@ sudo lvextend -L +5G /dev/data_vg/my_lv
 # 2. 在线扩容文件系统 (无需卸载!)
 sudo resize2fs /dev/data_vg/my_lv
 ```
+
+---
+
+## 在线演示
+
+[![asciicast](https://asciinema.org/a/891097.svg)](https://asciinema.org/a/891097)
