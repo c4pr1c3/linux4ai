@@ -158,3 +158,138 @@ docker run -v my-vol:/data my-app
 docker network create my-net
 docker run --network my-net my-app
 ```
+
+---
+
+# Topic 5: 调试、安全与实战进阶
+
+---
+
+## 容器排障三板斧
+
+> 容器启动失败时，90% 的问题可以通过这三个命令定位。
+
+```bash
+# 1. 看日志 — 第一步永远是日志
+docker logs -f my-app          # 实时跟踪
+docker logs --tail 50 my-app  # 最近 50 行
+docker logs my-app 2>&1 | grep -i error
+
+# 2. 进容器 — 确认文件和进程状态
+docker exec -it my-app sh      # 进入 Shell
+docker exec my-app cat /etc/nginx/nginx.conf  # 查看配置
+
+# 3. 看元数据 — 确认镜像、网络、挂载是否正确
+docker inspect my-app --format '{{.State.ExitCode}}'
+docker inspect my-app --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
+```
+
+**常见失败模式**:
+
+| 现象 | 可能原因 | 排查方式 |
+|:---|:---|:---|
+| 容器立即退出 | CMD 执行失败 / 入口脚本有错 | `docker logs` 看退出前输出 |
+| OOM Killed | 内存限制不足 | `docker inspect` 看 OOMKilled 字段 |
+| 端口冲突 | 主机端口已被占用 | `ss -tlnp` 检查端口 |
+| 权限不足 | 文件挂载权限问题 | 检查挂载目录的 UID/GID |
+
+---
+
+## Docker 安全基础
+
+> AI Agent 可以帮你写 Dockerfile，但它无法帮你判断安全边界——这需要你自己理解。
+
+```dockerfile
+# ❌ 反面示例：以 root 运行 + 安装不必要的软件
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y curl vim git wget
+COPY app.py .
+CMD ["python3", "app.py"]  # 以 root 身份运行
+
+# ✅ 正面示例：最小镜像 + 非 root 用户
+FROM python:3.12-slim
+RUN useradd -m appuser
+WORKDIR /app
+COPY --chown=appuser:appuser requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY --chown=appuser:appuser . .
+USER appuser
+CMD ["python", "app.py"]
+```
+
+**安全清单**:
+
+- **最小基础镜像**: `slim`/`alpine` 优于完整版
+- **不要以 root 运行**: `USER` 指令切换到非特权用户
+- **不要信任未知镜像**: 只使用官方或可信源
+- **`.dockerignore`**: 排除 `.git`/`.env`/`credentials.json`
+- **不要在镜像中硬编码密钥**: 用环境变量或 secrets 机制
+
+---
+
+## Docker Compose 入门
+
+> 真实项目几乎都是多容器：Web 应用 + 数据库 + 缓存。Compose 是定义和运行多容器应用的标配。
+
+`docker-compose.yml`:
+```yaml
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
+```
+
+```bash
+# 启动所有服务
+docker compose up -d
+
+# 查看服务状态
+docker compose ps
+
+# 查看所有服务日志
+docker compose logs -f
+
+# 停止并清理
+docker compose down -v
+```
+
+---
+
+## 容器与 AI 工作流
+
+> Claude Code、GitHub Codespaces、Dev Containers 等工具都用容器作为隔离的运行环境。
+
+**为什么 AI 工具偏爱容器**:
+
+- **一致性**: Agent 在容器中执行命令，结果可复现
+- **隔离性**: 避免污染宿主环境，`docker run --rm` 用完即弃
+- **沙箱**: 限制 Agent 的文件系统和网络访问范围
+
+**`docker run` 的高级参数**:
+
+```bash
+# 限制资源 — 防止失控
+docker run --memory=512m --cpus=1 my-app
+
+# 只读文件系统 — 防止意外写入
+docker run --read-only my-app
+
+# 临时容器 — 用完自动删除
+docker run --rm my-app
+
+# 环境变量注入 — 不暴露在镜像中
+docker run -e API_KEY=$API_KEY my-app
+```

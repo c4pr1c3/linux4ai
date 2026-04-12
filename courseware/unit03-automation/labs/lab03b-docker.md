@@ -95,6 +95,87 @@ docker run -d -p 8081:80 -v ~/html:/usr/share/nginx/html nginx:alpine
 
 3.  **验证**: 访问 `http://localhost:8081`，应看到 "Custom Home Page"。
 
+## 任务 4: Docker Compose 多容器应用
+
+1.  **创建项目目录**:
+
+```bash
+mkdir -p docker-compose-lab && cd docker-compose-lab
+```
+
+2.  **编写 `app.py`**:
+
+```python
+from flask import Flask
+import redis
+import os
+
+app = Flask(__name__)
+redis_client = redis.Redis(host='redis', port=6379)
+
+@app.route('/')
+def hello():
+    count = redis_client.incr('visits')
+    return f"Visit #{count} from container {os.environ.get('HOSTNAME', 'unknown')}"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+```
+
+3.  **编写 `Dockerfile`**:
+
+```dockerfile
+FROM python:3.12-slim
+WORKDIR /app
+RUN pip install --no-cache-dir flask redis
+COPY app.py .
+CMD ["python", "app.py"]
+```
+
+4.  **编写 `docker-compose.yml`**:
+
+```yaml
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
+```
+
+5.  **启动并验证**:
+
+```bash
+# 启动所有服务
+docker compose up -d --build
+
+# 查看服务状态
+docker compose ps
+
+# 多次访问，观察计数器递增
+curl http://localhost:5000
+curl http://localhost:5000
+
+# 查看日志
+docker compose logs web
+
+# 清理（数据卷一并删除）
+docker compose down -v
+```
+
+6.  **思考题**:
+    - 为什么 `app.py` 中 `host='redis'` 而不是 `host='localhost'`？（提示：容器网络隔离）
+    - 如果去掉 `redis-data` volume，重启后计数器还在吗？为什么？
+
 ## 提交物
 
 提交 `lab03b/report.md`：
