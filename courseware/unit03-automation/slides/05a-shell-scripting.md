@@ -221,6 +221,8 @@ process_data() {
 process_data "$1"
 ```
 
+---
+
 > `trap ... EXIT` 是「资源即用即释」的 Shell 实现，类似编程语言中的 `try/finally`。
 
 ---
@@ -253,6 +255,8 @@ port = 5432
 CONF
 ```
 
+---
+
 > Claude Code 的 heredoc 安全检查验证了三点：分隔符必须引号包裹、分隔符必须是独立行、不允许嵌套 heredoc 模式。
 
 ---
@@ -284,6 +288,8 @@ if [[ "$INPUT" == *../* ]]; then
     exit 1
 fi
 ```
+
+---
 
 > Claude Code 的启示：检查命令是否以 `-`、`&&`、`||`、`;` 开头 — 这些往往是命令拼接注入的信号。
 
