@@ -92,7 +92,9 @@ ansible webservers -m copy -a "src=./index.html dest=/tmp/" -i hosts.ini
 
 > 模板是 "数据驱动配置" 的核心——把变化的值抽成变量，不变的逻辑写成模板。
 
-**变量定义方式**:
+---
+
+## 变量定义方式
 
 ```yaml
 # 方式 1: Playbook 内联
@@ -114,7 +116,12 @@ app_user: www-data
 db_host: db.internal
 ```
 
-**Jinja2 模板语法** (`config.j2`):
+---
+
+## Jinja2 模板语法
+
+config.j2:
+
 ```jinja2
 server {
     listen {{ app_port }};
@@ -150,7 +157,9 @@ ansible-playbook site.yml -v   # 简要
 ansible-playbook site.yml -vvv # 极其详细
 ```
 
-**常见失败模式**:
+---
+
+## 常见失败模式
 
 | 报错 | 含义 | 解决方案 |
 |:---|:---|:---|
@@ -159,7 +168,10 @@ ansible-playbook site.yml -vvv # 极其详细
 | `changed` vs `failed` | 非预期变更 | `--check` 对比差异 |
 | `template error` | Jinja2 语法错 | `ansible-playbook -v` 看行号 |
 
-**Handler 触发调试**:
+---
+
+## Handler 触发调试
+
 ```yaml
 handlers:
   - name: reload nginx
@@ -181,6 +193,8 @@ handlers:
 
 > 当 Playbook 超过 30 行，就该拆成 Role 了。Role 是 Ansible 可复用的基本单元。
 
+---
+
 ```
 roles/
 └── nginx/
@@ -198,6 +212,8 @@ roles/
         └── main.yml      # 角色依赖
 ```
 
+---
+
 ```yaml
 # Playbook 中引用 Role
 - name: Deploy Full Stack
@@ -214,7 +230,9 @@ roles/
 
 > AI 可以帮你快速生成 Playbook，但验证和审计必须自己来。
 
-**正确的工作流**:
+---
+
+## 正确的工作流
 
 ```bash
 # 1. 让 AI 生成初版 Playbook
@@ -233,7 +251,9 @@ ansible-playbook site.yml
 ansible-playbook site.yml  # 第二次应全绿
 ```
 
-**AI 幻觉风险与应对**:
+---
+
+## AI 幻觉风险与应对
 
 | 幻觉类型 | 示例 | 应对策略 |
 |:---|:---|:---|
