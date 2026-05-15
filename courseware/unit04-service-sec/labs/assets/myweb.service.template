@@ -1,0 +1,27 @@
+# systemd 服务文件模板
+# 用途：将 Python http.server 注册为系统服务
+#
+# 使用方法：
+#   1. 复制到 /etc/systemd/system/myweb.service（系统级）
+#      或 ~/.config/systemd/user/myweb.service（用户级）
+#   2. 编辑 User、WorkingDirectory、ExecStart 中的路径
+#   3. sudo systemctl daemon-reload
+#   4. sudo systemctl enable --now myweb
+#
+# 注意：用户级服务不需要 [Install] 段的 WantedBy，
+#       且去掉 User= 行（默认当前用户）
+
+[Unit]
+Description=My Python Web Server
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/www
+ExecStart=/usr/bin/python3 -m http.server 8080
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
