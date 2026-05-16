@@ -72,23 +72,122 @@ sudo systemctl reload nginx
 
 ---
 
-## Caddy：无需 root 的替代方案
+## Caddy 简介
+
+**Caddy** — 默认安全，零配置 HTTPS 的 Web 服务器。
 
 在共享服务器上你没有 root 权限，无法安装/配置 Nginx。
-**Caddy** 可以在用户态运行，一行命令启动反向代理：
+Caddy 可以在用户态运行，一行命令启动反向代理。
+
+---
+
+## Caddy 安装方式一：官方 apt 源（推荐）
+
+适用于有 root 权限的 Debian/Ubuntu 系统：
 
 ```bash
-# 安装（无需 root，下载二进制即可）
+# 1. 安装依赖
+sudo apt install -y debian-keyring debian-archive-keyring \
+  apt-transport-https curl
+
+# 2. 添加 GPG 签名密钥
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+  | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+
+# 3. 添加软件源
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+  | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+
+# 4. 安装
+sudo apt update && sudo apt install caddy
+```
+
+---
+
+> 优势：自动注册为 systemd 服务，`apt upgrade` 即可跟随上游"傻瓜式"滚动升级。
+
+---
+
+## 管道命令的隐患 — 国内网络实战
+
+上面的第 2、3 步在**国内网络环境下大概率失败**：
+
+```text
+$ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+  | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl: (6) Could not resolve host: dl.cloudsmith.io
+```
+
+---
+
+**问题出在哪里？**
+
+1.  `curl` 失败（DNS 无法解析），但管道 `|` **不会阻止**后续命令执行
+2.  `gpg --dearmor` 读到空输入，可能创建**空文件**或报错
+3.  如果 `gpg` 没报错，`apt update` 后续会遇到签名验证失败——错误被"延迟暴露"
+
+> **教训**：不要盲目复制粘贴"一行安装"命令。执行前先验证网络连通性。
+
+---
+
+## 防御性编程：让管道"出错即停"
+
+```bash
+# 在脚本开头加上 pipefail，管道中任一命令失败则整体失败
+set -euo pipefail
+
+# 执行前先验证网络连通性
+curl -sSf 'https://dl.cloudsmith.io' > /dev/null && echo "网络可达" || echo "网络不通"
+
+# 或者将管道拆成多步，逐步检查
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+  -o /tmp/caddy-key.asc || { echo "下载 GPG 密钥失败"; exit 1; }
+sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg \
+  /tmp/caddy-key.asc
+```
+
+---
+
+> **口诀**：`set -euo pipefail` 是脚本的"安全带"。管道不是黑箱，拆开看才放心。
+
+---
+
+## Caddy 安装方式二：直接下载二进制（备用）
+
+无需 root，适合共享服务器 / 开发环境：
+
+```bash
+# 从 GitHub Releases 下载（选择对应架构）
 # https://github.com/caddyserver/caddy/releases
 
-# 一行命令：反向代理 :8000 → :8080
+# 解压并放到 ~/bin/ 或其他 PATH 目录
+chmod +x caddy
+mv caddy ~/bin/
+```
+
+---
+
+启动反向代理：
+
+```bash
+# 反向代理 :8000 → :8080
 caddy reverse-proxy --from :8000 --to :8080
 
 # 指定域名时自动申请 HTTPS 证书
 caddy reverse-proxy --from myapp.example.com --to :8080
 ```
 
-Caddy 的设计哲学：**默认安全，零配置 HTTPS**。
+---
+
+## Caddy 两种安装方式对比
+
+| 方式 | apt 源 | 直接下载二进制 |
+|------|--------|---------------|
+| 需要 root | 是 | 否 |
+| 自动 systemd 服务 | 是 | 需手动配置 |
+| 版本升级 | `apt upgrade` 傻瓜式滚动更新 | 手动下载替换二进制 |
+| 网络要求 | 需访问 cloudsmith.io | 需访问 github.com |
+| 适合场景 | 有 root 的生产服务器 | 共享服务器 / 开发环境 |
 
 ---
 
@@ -101,6 +200,8 @@ Caddy 的设计哲学：**默认安全，零配置 HTTPS**。
 | 需要 root | 是（监听 80/443） | 否（可监听高端口） |
 | HTTPS | 需手动配置证书 | 自动申请/续期 |
 | 适合场景 | 生产环境、复杂需求 | 开发环境、共享服务器 |
+
+---
 
 > **策略**：生产用 Nginx，开发/共享服务器用 Caddy。两条路都掌握。
 
