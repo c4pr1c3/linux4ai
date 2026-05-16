@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="黄玮">
+  <title>第四单元：服务交付与安全基线</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../../reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="../../../reveal.js/dist/reveal.css">
+  <style>
+      </style>
+  <link rel="stylesheet" href="../../../reveal.js/dist/theme/white.css" id="theme">
+  <style>
+.reveal .iframe-wrapper { position: relative; width: 100%; }
+.reveal .iframe-wrapper iframe { display: block; max-width: none; max-height: none; }
+.reveal .iframe-newwindow-btn {
+  position: absolute; top: 8px; right: 12px;
+  background: rgba(0,0,0,0.65); color: #fff;
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 13px; text-decoration: none;
+  opacity: 0.7; transition: opacity 0.2s;
+  z-index: 10;
+}
+.reveal .iframe-newwindow-btn:hover { opacity: 1; background: rgba(0,0,0,0.85); }
+  </style>
+  <link rel="stylesheet" href="../../../css/linux4ai.css"/>
+  <link rel="stylesheet" href="../../../reveal.js/plugin/highlight/monokai.css">
+  <!-- Printing and PDF exports -->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">第四单元：服务交付与安全基线</h1>
+  <p class="subtitle">Web 服务、反向代理、HTTPS 与 systemd</p>
+  <p class="author">黄玮</p>
+  <p class="date">2026-01</p>
+</section>
+
+<section>
+<section id="topic-1-web-服务架构" class="title-slide slide level1">
+<h1>Topic 1: Web 服务架构</h1>
+
+</section>
+<section id="为什么需要反向代理-reverse-proxy" class="slide level2">
+<h2>为什么需要反向代理 (Reverse Proxy)?</h2>
+<p>你写的 Python/Node.js 程序通常监听在 <code>localhost:8000</code>。 为什么不直接暴露给公网？</p>
+<ol type="1">
+<li><strong>安全</strong>: Nginx 更加健壮，能抗住慢连接攻击。</li>
+<li><strong>性能</strong>: 处理静态文件、Gzip 压缩、缓存。</li>
+<li><strong>灵活</strong>: 负载均衡、SSL 卸载、统一日志。</li>
+</ol>
+</section>
+<section id="直接暴露-vs-反向代理" class="slide level2">
+<h2>直接暴露 vs 反向代理</h2>
+<iframe src="assets/direct-vs-reverse-proxy.html" style="width:100%;height:620px;border:none;border-radius:8px;">
+</iframe>
+</section>
+<section id="nginx-核心配置" class="slide level2">
+<h2>Nginx 核心配置</h2>
+<p><code>/etc/nginx/sites-available/default</code>:</p>
+<pre class="nginx"><code>server {
+    listen 80;
+    server_name example.com;
+
+    # 静态文件
+    location /static/ {
+        root /var/www/html;
+    }
+
+    # 反向代理
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}</code></pre>
+</section>
+<section id="nginx-配置验证与重载" class="slide level2">
+<h2>Nginx 配置验证与重载</h2>
+<p>修改配置后，<strong>不要</strong>直接重启服务（会断开现有连接）：</p>
+<pre class="bash"><code># 检查语法（养成习惯：每次改配置都先检查）
+sudo nginx -t
+
+# 输出示例：
+# nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+# nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+# 平滑重载配置（不断开连接）
+sudo systemctl reload nginx</code></pre>
+<blockquote>
+<p><strong>口诀</strong>：改配置 → <code>nginx -t</code> → <code>reload</code>。永远不要跳过测试步骤。</p>
+</blockquote>
+</section>
+<section id="caddy无需-root-的替代方案" class="slide level2">
+<h2>Caddy：无需 root 的替代方案</h2>
+<p>在共享服务器上你没有 root 权限，无法安装/配置 Nginx。 <strong>Caddy</strong> 可以在用户态运行，一行命令启动反向代理：</p>
+<pre class="bash"><code># 安装（无需 root，下载二进制即可）
+# https://github.com/caddyserver/caddy/releases
+
+# 一行命令：反向代理 :8000 → :8080
+caddy reverse-proxy --from :8000 --to :8080
+
+# 指定域名时自动申请 HTTPS 证书
+caddy reverse-proxy --from myapp.example.com --to :8080</code></pre>
+<p>Caddy 的设计哲学：<strong>默认安全，零配置 HTTPS</strong>。</p>
+</section>
+<section id="nginx-vs-caddy-对比" class="slide level2">
+<h2>Nginx vs Caddy 对比</h2>
+<table>
+<thead>
+<tr class="header">
+<th>特性</th>
+<th>Nginx</th>
+<th>Caddy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>行业地位</td>
+<td>事实标准，33%+ 市场份额</td>
+<td>新兴选择，快速成长</td>
+</tr>
+<tr class="even">
+<td>配置复杂度</td>
+<td>手动编写 conf 文件</td>
+<td>极简命令行 / Caddyfile</td>
+</tr>
+<tr class="odd">
+<td>需要 root</td>
+<td>是（监听 80/443）</td>
+<td>否（可监听高端口）</td>
+</tr>
+<tr class="even">
+<td>HTTPS</td>
+<td>需手动配置证书</td>
+<td>自动申请/续期</td>
+</tr>
+<tr class="odd">
+<td>适合场景</td>
+<td>生产环境、复杂需求</td>
+<td>开发环境、共享服务器</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>策略</strong>：生产用 Nginx，开发/共享服务器用 Caddy。两条路都掌握。</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="topic-2-日志与观测" class="title-slide slide level1">
+<h1>Topic 2: 日志与观测</h1>
+
+</section>
+<section id="access-log-黄金指标" class="slide level2">
+<h2>Access Log 黄金指标</h2>
+<p><code>tail -f /var/log/nginx/access.log</code>：</p>
+<pre class="text"><code>192.168.1.5 - - [12/Jan/2026:10:00:00 +0800] &quot;GET /api/v1/users HTTP/1.1&quot; 200 1024 &quot;-&quot; &quot;Mozilla/5.0...&quot;</code></pre>
+<p>关注点：</p>
+<ol type="1">
+<li><strong>$remote_addr</strong> — 谁在访问？</li>
+<li><strong>$status</strong> — 200(OK), 404(Not Found), 500(Server Error)。</li>
+<li><strong>$request_time</strong> — 响应慢吗？（需在 nginx.conf 中自定义 log_format）</li>
+</ol>
+<p>自定义 log_format 添加 <code>$request_time</code>：</p>
+<pre class="nginx"><code>log_format timed &#39;$remote_addr - $remote_user [$time_local] &#39;
+                 &#39;&quot;$request&quot; $status $body_bytes_sent &#39;
+                 &#39;&quot;$http_referer&quot; &quot;$http_user_agent&quot; $request_time&#39;;
+access_log /var/log/nginx/access.log timed;</code></pre>
+</section>
+<section id="日志分析实战" class="slide level2">
+<h2>日志分析实战</h2>
+<p><strong>场景</strong>：老板说「网站好像有点慢」，你需要用数据说话。</p>
+<pre class="bash"><code># 1. 状态码分布 — 服务健康吗？
+awk &#39;{print $9}&#39; access.log | sort | uniq -c | sort -rn
+#   1523 200
+#    234 404
+#     12 500    ← 500 错误需要关注！
+
+# 2. 响应最慢的 5 个请求（假设已配置 $request_time）
+awk &#39;{print $NF, $0}&#39; access.log | sort -rn | head -5
+
+# 3. 访问量 Top 10 IP
+awk &#39;{print $1}&#39; access.log | sort | uniq -c | sort -rn | head -10
+
+# 4. 实时监控 500 错误
+tail -f access.log | awk &#39;$9 == 500 {print $0}&#39;</code></pre>
+</section>
+<section class="slide level2">
+
+<blockquote>
+<p><strong>管道思维</strong>：<code>awk 提取字段</code> → <code>sort 排序</code> → <code>uniq -c 计数</code> → <code>sort -rn 按数量排序</code>。这套组合拳适用于任何文本日志分析。</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="topic-3-https-与-tls" class="title-slide slide level1">
+<h1>Topic 3: HTTPS 与 TLS</h1>
+
+</section>
+<section id="为什么需要-https" class="slide level2">
+<h2>为什么需要 HTTPS？</h2>
+<p>HTTP 是明文传输，任何人都可以截获你的数据：</p>
+<iframe src="assets/http-vs-https.html" style="width:100%;height:620px;border:none;border-radius:8px;">
+</iframe>
+<p><strong>TLS 握手</strong>（简化版）：客户端和服务器协商密钥 → 之后所有数据加密传输。</p>
+<blockquote>
+<p>2018 年起，Chrome 对所有 HTTP 站点标记「不安全」。HTTPS 已是<strong>必选项</strong>，不是可选项。</p>
+</blockquote>
+</section>
+<section id="自签名证书nginx" class="slide level2">
+<h2>自签名证书（Nginx）</h2>
+<p>局域网/开发环境，没有公网域名？用自签名证书：</p>
+<pre class="bash"><code># 生成自签名证书（一行命令）
+openssl req -x509 -newkey rsa:2048 \
+  -keyout key.pem -out cert.pem \
+  -days 365 -nodes \
+  -subj &quot;/CN=localhost&quot;</code></pre>
+</section>
+<section class="slide level2">
+
+<p>Nginx 配置 HTTPS：</p>
+<pre class="nginx"><code>server {
+    listen 443 ssl;
+    server_name localhost;
+
+    ssl_certificate     /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+    }
+}</code></pre>
+</section>
+<section class="slide level2">
+
+<p>验证：<code>curl -k https://localhost</code>（<code>-k</code> 跳过证书验证警告）</p>
+</section>
+<section id="自动-httpscaddy" class="slide level2">
+<h2>自动 HTTPS（Caddy）</h2>
+<p>Caddy 的 HTTPS 是<strong>零配置</strong>的：</p>
+<pre class="bash"><code># 有公网域名 → 自动申请 Let&#39;s Encrypt 证书
+caddy reverse-proxy --from example.com --to :8080
+
+# 局域网/localhost → 自动生成自签名证书
+caddy reverse-proxy --from :443 --to :8080</code></pre>
+</section>
+<section class="slide level2">
+
+<table>
+<thead>
+<tr class="header">
+<th>场景</th>
+<th>Nginx</th>
+<th>Caddy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>公网域名</td>
+<td>手动配置 certbot + 证书</td>
+<td>自动（Let’s Encrypt）</td>
+</tr>
+<tr class="even">
+<td>局域网/localhost</td>
+<td>手动 openssl + 配置</td>
+<td>自动（自签名）</td>
+</tr>
+<tr class="odd">
+<td>证书续期</td>
+<td>手动 crontab</td>
+<td>自动后台续期</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>实验时</strong>：两条路都走一遍，体验「手动 vs 自动」的差异。</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="topic-4-systemd-服务管理" class="title-slide slide level1">
+<h1>Topic 4: systemd 服务管理</h1>
+
+</section>
+<section id="从临时进程到系统服务" class="slide level2">
+<h2>从临时进程到系统服务</h2>
+<p><code>python3 -m http.server 8080 &amp;</code> 的问题：</p>
+<ol type="1">
+<li><strong>关终端就停</strong> — SIGHUP 信号杀死后台进程</li>
+<li><strong>开机不自动启动</strong> — 每次手动运行</li>
+<li><strong>没有日志管理</strong> — 输出丢失，难以排查</li>
+<li><strong>没有重启策略</strong> — 崩溃后无人拉起</li>
+</ol>
+<p><strong>systemd</strong> = Linux 的「服务管家」，解决以上所有问题。</p>
+</section>
+<section id="systemd-基础命令" class="slide level2">
+<h2>systemd 基础命令</h2>
+<pre class="bash"><code># 服务生命周期管理
+sudo systemctl start   myweb     # 启动
+sudo systemctl stop    myweb     # 停止
+sudo systemctl restart myweb     # 重启
+sudo systemctl status  myweb     # 查看状态（最常用！）
+
+# 开机自启动
+sudo systemctl enable  myweb     # 开机自动启动
+sudo systemctl disable myweb     # 取消自动启动
+
+# 查看日志（神器）
+sudo journalctl -u myweb              # 查看全部日志
+sudo journalctl -u myweb -f           # 实时跟踪日志（类似 tail -f）
+sudo journalctl -u myweb --since today # 今天的日志</code></pre>
+<blockquote>
+<p><strong>记忆技巧</strong>：<code>systemctl</code> = 「系统控制」，所有服务操作都走它。</p>
+</blockquote>
+</section>
+<section id="编写你的第一个-.service-文件" class="slide level2">
+<h2>编写你的第一个 .service 文件</h2>
+<p>创建 <code>/etc/systemd/system/myweb.service</code>：</p>
+<pre class="ini"><code>[Unit]
+Description=My Python Web Server
+After=network.target
+
+[Service]
+Type=simple
+User=你的用户名
+WorkingDirectory=/home/你的用户名/www
+ExecStart=/usr/bin/python3 -m http.server 8080
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+</section>
+<section class="slide level2">
+
+<p>启用并启动：</p>
+<pre class="bash"><code>sudo systemctl daemon-reload    # 通知 systemd 读取新配置
+sudo systemctl enable myweb     # 开机自启
+sudo systemctl start myweb      # 立即启动
+sudo systemctl status myweb     # 确认运行状态</code></pre>
+<blockquote>
+<p><strong>验证闭环</strong>：关掉终端 → <code>curl http://localhost:8080</code> → 仍然可以访问 = 成功！</p>
+</blockquote>
+</section>
+<section id="无-root用户级-systemd共享服务器" class="slide level2">
+<h2>无 root？用户级 systemd（共享服务器）</h2>
+<p>没有 sudo 权限也能用 systemd，使用 <code>--user</code> 模式：</p>
+<pre class="bash"><code># 创建用户级服务目录
+mkdir -p ~/.config/systemd/user/
+
+# 放置 service 文件（去掉 User= 行，默认当前用户）
+cp myweb.service ~/.config/systemd/user/
+
+# 所有命令加 --user，无需 sudo
+systemctl --user daemon-reload
+systemctl --user enable --now myweb
+systemctl --user status myweb
+systemctl --user journalctl -u myweb   # 查看日志也不需要 sudo</code></pre>
+</section>
+<section class="slide level2">
+
+<table>
+<thead>
+<tr class="header">
+<th>特性</th>
+<th>系统级 (<code>/etc/systemd/system/</code>)</th>
+<th>用户级 (<code>~/.config/systemd/user/</code>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>需要 root</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr class="even">
+<td>用户登录时才运行</td>
+<td>否（开机即运行）</td>
+<td>默认是（可配置 lingering）</td>
+</tr>
+<tr class="odd">
+<td>端口限制</td>
+<td>无</td>
+<td>只能绑定 &gt;1024 端口</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>开启 lingering</strong>（用户注销后服务继续运行）：<code>loginctl enable-linger 你的用户名</code></p>
+</blockquote>
+</section>
+<section id="小结web-服务交付完整链路" class="slide level2">
+<h2>小结：Web 服务交付完整链路</h2>
+<iframe src="assets/web-service-chain.html" style="width:100%;height:620px;border:none;border-radius:8px;">
+</iframe>
+<p>每一步都是生产环境的基本要求。你现在已经掌握了 Web 服务交付的完整链路。</p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="../../../reveal.js/dist/reveal.js"></script>
+  <script src="../../../reveal.js/plugin/highlight/highlight.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        plugins: [ RevealHighlight ],
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'fade', // none/fade/slide/convex/concave/zoom
+        math: {
+          mathjax: '/usr/share/javascript/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: '../../../reveal.js/plugin/zoom/zoom.js', async: true },
+          { src: '../../../reveal.js/plugin/math/math.js', async: true },
+          { src: '../../../reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+
+      // Add "open in new window" button to all iframes
+      Reveal.on('ready', function() {
+        document.querySelectorAll('.slides section iframe').forEach(function(iframe) {
+          var wrapper = document.createElement('div');
+          wrapper.className = 'iframe-wrapper';
+          var link = document.createElement('a');
+          link.className = 'iframe-newwindow-btn';
+          link.href = iframe.src;
+          link.target = '_blank';
+          link.title = '在新窗口打开';
+          link.textContent = '↗ 新窗口打开';
+          iframe.parentNode.insertBefore(wrapper, iframe);
+          wrapper.appendChild(iframe);
+          wrapper.appendChild(link);
+        });
+      });
+    </script>
+    </body>
+</html>

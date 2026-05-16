@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="黄玮">
+  <title>第四单元：服务交付与安全基线</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../../reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="../../../reveal.js/dist/reveal.css">
+  <style>
+      </style>
+  <link rel="stylesheet" href="../../../reveal.js/dist/theme/white.css" id="theme">
+  <style>
+.reveal .iframe-wrapper { position: relative; width: 100%; }
+.reveal .iframe-wrapper iframe { display: block; max-width: none; max-height: none; }
+.reveal .iframe-newwindow-btn {
+  position: absolute; top: 8px; right: 12px;
+  background: rgba(0,0,0,0.65); color: #fff;
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 13px; text-decoration: none;
+  opacity: 0.7; transition: opacity 0.2s;
+  z-index: 10;
+}
+.reveal .iframe-newwindow-btn:hover { opacity: 1; background: rgba(0,0,0,0.85); }
+  </style>
+  <link rel="stylesheet" href="../../../css/linux4ai.css"/>
+  <link rel="stylesheet" href="../../../reveal.js/plugin/highlight/monokai.css">
+  <!-- Printing and PDF exports -->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">第四单元：服务交付与安全基线</h1>
+  <p class="subtitle">安全基线、防火墙与 AI 辅助运维</p>
+  <p class="author">黄玮</p>
+  <p class="date">2026-01</p>
+</section>
+
+<section>
+<section id="topic-1-linux-安全基线" class="title-slide slide level1">
+<h1>Topic 1: Linux 安全基线</h1>
+
+</section>
+<section id="最小权限原则-least-privilege" class="slide level2">
+<h2>最小权限原则 (Least Privilege)</h2>
+<blockquote>
+<p>“只给予完成工作所需的最小权限。”</p>
+</blockquote>
+<ul>
+<li><strong>Root</strong>: 尽量不用。使用 <code>sudo</code> 进行审计。</li>
+<li><strong>文件权限</strong>: 配置文件不应为 <code>777</code>。</li>
+<li><strong>网络</strong>: 仅开放必要的端口 (UFW / iptables)。</li>
+</ul>
+</section>
+<section id="ssh-加固清单" class="slide level2">
+<h2>SSH 加固清单</h2>
+<p>编辑 <code>/etc/ssh/sshd_config</code>：</p>
+<ol type="1">
+<li><strong>禁用 Root 登录</strong>: <code>PermitRootLogin no</code></li>
+<li><strong>禁用密码认证</strong> (强制密钥): <code>PasswordAuthentication no</code></li>
+<li><strong>修改默认端口</strong> (可选，防扫描): <code>Port 2222</code></li>
+</ol>
+<p>修改后：<code>sudo systemctl restart sshd</code></p>
+<blockquote>
+<p><strong>警告</strong>：改 SSH 配置前，先开一个备用终端连着，防止改错锁死自己！</p>
+</blockquote>
+</section>
+<section id="ssh-日志分析谁在暴力破解你" class="slide level2">
+<h2>SSH 日志分析：谁在暴力破解你？</h2>
+<p><code>/var/log/auth.log</code> 记录了所有 SSH 登录尝试：</p>
+<pre class="bash"><code># 登录失败最多的前 5 个 IP（攻击来源）
+grep &quot;Failed password&quot; /var/log/auth.log | \
+  awk &#39;{print $(NF-3)}&#39; | sort | uniq -c | sort -rn | head -5
+
+# 被尝试最多的用户名（含无效用户）
+grep &quot;Failed password&quot; /var/log/auth.log | \
+  grep &quot;invalid user&quot; | awk &#39;{print $(NF-5)}&#39; | sort | uniq -c | sort -rn
+
+# 登录成功记录（确认合法访问）
+grep &quot;Accepted&quot; /var/log/auth.log</code></pre>
+</section>
+<section class="slide level2">
+
+<blockquote>
+<p><strong>管道思维回顾</strong>：<code>grep 过滤</code> → <code>awk 提取字段</code> → <code>sort 排序</code> → <code>uniq -c 计数</code> → <code>sort -rn 按数量排序</code>。这套路和 Nginx 日志分析完全一样！</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="topic-2-防火墙" class="title-slide slide level1">
+<h1>Topic 2: 防火墙</h1>
+
+</section>
+<section id="ufw防火墙傻瓜式管理" class="slide level2">
+<h2>UFW：防火墙傻瓜式管理</h2>
+<p>Ubuntu 默认防火墙工具 <strong>UFW</strong> (Uncomplicated Firewall)：</p>
+<pre class="bash"><code># 查看状态
+sudo ufw status verbose
+
+# 放行规则（先放行 SSH，再启用！）
+sudo ufw allow 22/tcp       # SSH
+sudo ufw allow 80/tcp       # HTTP
+sudo ufw allow 443/tcp      # HTTPS
+
+# 启用防火墙
+sudo ufw enable
+
+# 拒绝特定 IP
+sudo ufw deny from 192.168.1.100
+
+# 删除规则
+sudo ufw delete allow 80/tcp</code></pre>
+<blockquote>
+<p><strong>铁律</strong>：<code>ufw enable</code> 之前，务必先 <code>ufw allow 22/tcp</code>，否则 SSH 立刻断开！</p>
+</blockquote>
+</section>
+<section id="ufw-与-nginx-联动最小暴露面" class="slide level2">
+<h2>UFW 与 Nginx 联动：最小暴露面</h2>
+<iframe src="assets/ufw-nginx-arch.html" style="width:100%;height:620px;border:none;border-radius:8px;">
+</iframe>
+</section>
+<section class="slide level2">
+
+<p>原则：<strong>只暴露反向代理端口，后端端口全部封闭</strong>。</p>
+<ul>
+<li>外部只能访问 :80 (HTTP) / :443 (HTTPS)</li>
+<li>后端 :8080 只有 Nginx 能访问，外部无法直连</li>
+<li>攻击面从「所有端口」缩小到「仅 80/443」</li>
+</ul>
+</section>
+<section class="slide level2">
+
+</section></section>
+<section>
+<section id="topic-3-ai-辅助运维" class="title-slide slide level1">
+<h1>Topic 3: AI 辅助运维</h1>
+
+</section>
+<section id="ai-是副驾驶你是机长" class="slide level2">
+<h2>AI 是副驾驶，你是机长</h2>
+<p>LLM (ChatGPT/Claude/DeepSeek) 非常擅长写脚本，但它们会犯错（幻觉）。</p>
+<p><strong>经典翻车案例</strong>：</p>
+<ul>
+<li>用户: “帮我删除旧日志”</li>
+<li>AI: <code>find / -name "*.log" -delete</code></li>
+<li><strong>后果</strong>: 删除了 <code>/usr</code> 下的系统日志甚至应用日志，导致系统崩溃。</li>
+</ul>
+</section>
+<section id="ai-危险案例-1命令注入" class="slide level2">
+<h2>AI 危险案例 1：命令注入</h2>
+<p>AI 生成的脚本直接拼接用户输入：</p>
+<pre class="python"><code># AI 生成的 &quot;Ping 检测工具&quot;
+import os
+ip = input(&quot;请输入 IP 地址: &quot;)
+os.system(&quot;ping -c 3 &quot; + ip)</code></pre>
+</section>
+<section class="slide level2">
+
+<p>攻击者输入：<code>127.0.0.1; rm -rf /</code></p>
+<p>实际执行：<code>ping -c 3 127.0.0.1; rm -rf /</code></p>
+<p><strong>修复</strong>：使用参数化调用，禁止 shell 拼接：</p>
+<pre class="python"><code>import subprocess
+subprocess.run([&quot;ping&quot;, &quot;-c&quot;, &quot;3&quot;, ip], check=True)</code></pre>
+</section>
+<section id="ai-危险案例-2路径遍历" class="slide level2">
+<h2>AI 危险案例 2：路径遍历</h2>
+<p>AI 生成的文件读取代码未校验路径：</p>
+<pre class="python"><code># AI 生成的 &quot;日志查看工具&quot;
+filename = input(&quot;请输入日志文件名: &quot;)
+with open(f&quot;/var/log/{filename}&quot;) as f:
+    print(f.read())</code></pre>
+</section>
+<section class="slide level2">
+
+<p>攻击者输入：<code>../../etc/shadow</code></p>
+<p>实际读取：<code>/var/log/../../etc/shadow</code> = <code>/etc/shadow</code></p>
+<p><strong>修复</strong>：校验真实路径，限制在允许目录内：</p>
+<pre class="python"><code>import os
+real_path = os.path.realpath(f&quot;/var/log/{filename}&quot;)
+if not real_path.startswith(&quot;/var/log/&quot;):
+    raise ValueError(&quot;非法路径&quot;)</code></pre>
+</section>
+<section id="ai-危险案例-3过度权限" class="slide level2">
+<h2>AI 危险案例 3：过度权限</h2>
+<p>AI 生成脚本时倾向于「先让它跑起来」，经常给出危险的权限设置：</p>
+<table>
+<thead>
+<tr class="header">
+<th>危险模式</th>
+<th>后果</th>
+<th>安全替代</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>chmod 777 /var/www</code></td>
+<td>任何人可修改网站文件</td>
+<td><code>chmod 755</code> + 合理的属主</td>
+</tr>
+<tr class="even">
+<td><code>curl xxx \| bash</code></td>
+<td>下载的脚本可能包含恶意代码</td>
+<td>先下载审查，再执行</td>
+</tr>
+<tr class="odd">
+<td><code>docker run --privileged</code></td>
+<td>容器获得宿主机全部权限</td>
+<td>去掉 <code>--privileged</code>，按需挂载</td>
+</tr>
+<tr class="even">
+<td><code>sudo</code> 在脚本中</td>
+<td>提权操作无审计</td>
+<td>仅在必要时 sudo，记录日志</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>原则</strong>：AI 给的权限如果超过你的需求，立即降级。</p>
+</blockquote>
+</section>
+<section id="ai-危险案例-4一个真实案例-ai-如何反复犯错" class="slide level2">
+<h2>AI 危险案例 4：一个真实案例 — AI 如何反复犯错</h2>
+<blockquote>
+<p><strong>本案例 100% 真实</strong>：以下是课件制作者本人让 AI 编写 TOCTOU（竞态条件）教学示例时的完整纠偏过程。每一轮都是 AI 实际输出的内容。</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+<h3 id="第-1-轮ai-提交初稿">第 1 轮：AI 提交初稿</h3>
+<blockquote>
+<p><strong>教师需求</strong>：在课件中增加一个 TOCTOU 竞态条件的安全案例。</p>
+</blockquote>
+<p><strong>AI 输出</strong>：</p>
+<pre class="bash"><code># AI 生成的 &quot;安全删除临时文件&quot;
+if [ -f &quot;/tmp/$FILENAME&quot; ]; then    # 检查
+    rm &quot;/tmp/$FILENAME&quot;              # 删除
+fi</code></pre>
+</section>
+<section class="slide level2">
+
+<p>AI 声称：攻击者将 <code>/tmp/data</code> 替换为指向 <code>/etc/passwd</code> 的符号链接，<code>rm</code> 会跟踪链接删除系统文件。</p>
+</section>
+<section class="slide level2">
+
+<h3 id="第-1-轮教师纠偏">第 1 轮：教师纠偏</h3>
+<blockquote>
+<p><code>rm</code> 对符号链接的行为是<strong>删除链接本身</strong>，不会跟踪到目标文件。这个举例在技术上是错误的。</p>
+</blockquote>
+<p><strong>核心知识点</strong>：<code>rm</code>、<code>mv</code> 作用于符号链接时，只操作链接本身，<strong>不跟踪</strong>到目标。</p>
+</section>
+<section class="slide level2">
+
+<h3 id="第-2-轮ai-修正仍然有错">第 2 轮：AI 修正（仍然有错）</h3>
+<p><strong>AI 修改后</strong>：改用「硬链接 + mv」场景：</p>
+<pre class="bash"><code># AI 修改后的 &quot;日志轮转工具&quot;
+LOG=&quot;/tmp/$APPNAME.log&quot;
+if [ -f &quot;$LOG&quot; ]; then
+    mv &quot;$LOG&quot; &quot;${LOG}.$(date +%s).bak&quot;   # 重命名
+fi</code></pre>
+</section>
+<section class="slide level2">
+
+<p>AI 声称：攻击者创建指向 <code>/etc/crontab</code> 的硬链接，<code>mv</code> 会泄漏文件内容。</p>
+</section>
+<section class="slide level2">
+
+<h3 id="第-2-轮教师纠偏">第 2 轮：教师纠偏</h3>
+<blockquote>
+<p>两个问题：</p>
+<ol type="1">
+<li><strong>硬链接不可行</strong>：普通用户无法对 <code>/etc/crontab</code> 创建硬链接（需要对该文件的写权限）。</li>
+<li><strong>mv 行为理解错误</strong>：<code>mv</code> 对符号链接只移动链接本身，不跟踪目标。对硬链接，<code>mv</code> 只是重命名目录项，原文件不受影响——说「获得副本」完全错误。</li>
+</ol>
+<p>真正跟踪符号链接的是<strong>写入操作</strong>：<code>&gt;</code>、<code>&gt;&gt;</code>、<code>cp</code>、<code>touch</code>、<code>chmod</code>。</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+<h3 id="第-3-轮ai-修正场景仍有问题">第 3 轮：AI 修正（场景仍有问题）</h3>
+<p><strong>AI 修改后</strong>：改用 <code>&gt;</code> 写入 + <code>/tmp</code> 目录：</p>
+<pre class="bash"><code>LOG=&quot;/tmp/$APPNAME.log&quot;
+if [ -f &quot;$LOG&quot; ]; then
+    &gt; &quot;$LOG&quot;    # 清空文件（跟踪符号链接）
+fi</code></pre>
+</section>
+<section class="slide level2">
+
+<p>AI 声称：攻击者在 <code>/tmp</code> 中将文件替换为符号链接。</p>
+</section>
+<section class="slide level2">
+
+<h3 id="第-3-轮教师纠偏">第 3 轮：教师纠偏</h3>
+<blockquote>
+<p><code>/tmp</code> 目录有 <strong>sticky bit</strong>（<code>drwxrwxrwt</code>），只有文件属主、目录属主或 root 才能删除/重命名文件。如果文件是脚本创建的，攻击者（非属主）无法替换它。</p>
+<p>应将场景放在<strong>无 sticky bit 的共享目录</strong>中，并说明 sticky bit 的防护作用。</p>
+</blockquote>
+</section>
+<section class="slide level2">
+
+<h3 id="最终版ai-输出正确案例">最终版：AI 输出正确案例</h3>
+<pre class="bash"><code># 正确的 TOCTOU 示例
+# 工作目录：/var/www/logs/ （多人可写的共享目录，无 sticky bit）
+LOG=&quot;/var/www/logs/$APPNAME.log&quot;
+if [ -f &quot;$LOG&quot; ]; then        # 检查文件存在
+    &gt; &quot;$LOG&quot;                   # 清空文件（跟踪符号链接到目标！）
+fi</code></pre>
+</section>
+<section class="slide level2">
+
+<p>攻击前提明确：</p>
+<ol type="1">
+<li>目录无 sticky bit，有写权限的任何用户可替换文件</li>
+<li><code>&gt;</code> 跟踪符号链接到目标文件（与 <code>rm</code>/<code>mv</code> 不同）</li>
+<li>攻击者在检查与操作之间的瞬间替换文件</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<h3 id="本案例的教训">本案例的教训</h3>
+<table>
+<thead>
+<tr class="header">
+<th>轮次</th>
+<th>AI 犯了什么错</th>
+<th>教训</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>第 1 轮</td>
+<td><code>rm</code> 不跟踪符号链接</td>
+<td>AI 对命令行为的理解可能<strong>根本性错误</strong></td>
+</tr>
+<tr class="even">
+<td>第 2 轮</td>
+<td>硬链接不可行 + <code>mv</code> 不跟踪链接</td>
+<td>AI 会「换个错误」而非真正理解问题</td>
+</tr>
+<tr class="odd">
+<td>第 3 轮</td>
+<td>忽略 sticky bit 防护</td>
+<td>AI 缺乏<strong>系统级上下文</strong>（文件系统权限模型）</td>
+</tr>
+<tr class="even">
+<td>最终</td>
+<td>经过 3 轮人工纠偏才正确</td>
+<td><strong>AI 不会自己发现这些错误</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>结论</strong>：AI 一口气生成了「看起来专业」的案例，但连续 3 轮都存在事实性错误。如果没有具备专业知识的人审核，这些错误会直接进入教材，误导学生。<strong>你，才是最终的把关人。</strong></p>
+</blockquote>
+</section>
+<section id="安全的-ai-工作流" class="slide level2">
+<h2>安全的 AI 工作流</h2>
+<iframe src="assets/ai-secure-workflow.html" style="width:100%;height:620px;border:none;border-radius:8px;">
+</iframe>
+</section>
+<section class="slide level2">
+
+<p><strong>Prompt 阶段</strong>：增加安全约束</p>
+<ul>
+<li>“写一个 Bash 脚本备份 /var/www，保留最近 7 天。<strong>必须检查目录是否存在，操作前打印日志</strong>。”</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p><strong>Review 阶段</strong>：高危命令检查清单</p>
+<ul>
+<li><code>rm</code> / <code>rmdir</code> — 确认删除目标和条件</li>
+<li><code>chmod 777</code> — 几乎总是错误的</li>
+<li><code>dd</code> / <code>mkfs</code> — 磁盘操作，不可逆</li>
+<li><code>&gt; /dev/sda</code> — 写裸设备</li>
+<li><code>curl | bash</code> / <code>wget | sh</code> — 远程代码执行</li>
+<li>未引号的变量 — 空值或含空格时行为异常</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<p><strong>Test 阶段</strong>：在 VM/WSL 中验证，不要在生产环境直接跑。</p>
+</section>
+<section id="小结安全不是一次性的" class="slide level2">
+<h2>小结：安全不是一次性的</h2>
+<ol type="1">
+<li><strong>最小权限</strong> — root 少用，端口少开，权限收紧</li>
+<li><strong>防御纵深</strong> — SSH 加固 + 防火墙 + 反向代理，多层防护</li>
+<li><strong>AI 审计意识</strong> — AI 生成的代码必须经过 Review → Test → Run 流程</li>
+<li><strong>持续观测</strong> — 日志是你的眼睛，定期检查 access.log 和 auth.log</li>
+</ol>
+<blockquote>
+<p>安全是一个过程，不是一个产品。</p>
+</blockquote>
+</section></section>
+    </div>
+  </div>
+
+  <script src="../../../reveal.js/dist/reveal.js"></script>
+  <script src="../../../reveal.js/plugin/highlight/highlight.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        plugins: [ RevealHighlight ],
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'fade', // none/fade/slide/convex/concave/zoom
+        math: {
+          mathjax: '/usr/share/javascript/mathjax/tex-mml-chtml.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: '../../../reveal.js/plugin/zoom/zoom.js', async: true },
+          { src: '../../../reveal.js/plugin/math/math.js', async: true },
+          { src: '../../../reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+
+      // Add "open in new window" button to all iframes
+      Reveal.on('ready', function() {
+        document.querySelectorAll('.slides section iframe').forEach(function(iframe) {
+          var wrapper = document.createElement('div');
+          wrapper.className = 'iframe-wrapper';
+          var link = document.createElement('a');
+          link.className = 'iframe-newwindow-btn';
+          link.href = iframe.src;
+          link.target = '_blank';
+          link.title = '在新窗口打开';
+          link.textContent = '↗ 新窗口打开';
+          iframe.parentNode.insertBefore(wrapper, iframe);
+          wrapper.appendChild(iframe);
+          wrapper.appendChild(link);
+        });
+      });
+    </script>
+    </body>
+</html>

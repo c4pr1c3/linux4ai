@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web 服务交付完整链路</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 100%; height: 100%;
+    background: #FFFFFF;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #222;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: 3vh 5vw;
+  }
+  .container {
+    position: relative;
+    width: 1600px; height: 650px;
+  }
+  .title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 28px;
+  }
+
+  /* Horizontal chain */
+  .chain {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    justify-content: center;
+  }
+
+  .step-card {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #fff;
+    margin-bottom: 10px;
+  }
+  .step-icon {
+    width: 72px; height: 72px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  .step-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .step-desc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    padding: 0 8px;
+  }
+  .step-tech {
+    margin-top: 8px;
+    font-family: 'Fira Code', Consolas, monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #F5F5F5;
+    color: #444;
+  }
+
+  /* Arrow connectors */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    padding-bottom: 36px;
+  }
+  .connector .arrow {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ccc;
+  }
+
+  /* Step colors */
+  .step-card:nth-child(1) .step-num { background: #6C5CE7; }
+  .step-card:nth-child(1) .step-icon { background: #F0EDFC; }
+  .step-card:nth-child(1) .step-name { color: #6C5CE7; }
+
+  .step-card:nth-child(3) .step-num { background: #0366D6; }
+  .step-card:nth-child(3) .step-icon { background: #EBF4FF; }
+  .step-card:nth-child(3) .step-name { color: #0366D6; }
+
+  .step-card:nth-child(5) .step-num { background: #E67E22; }
+  .step-card:nth-child(5) .step-icon { background: #FEF5E7; }
+  .step-card:nth-child(5) .step-name { color: #E67E22; }
+
+  .step-card:nth-child(7) .step-num { background: #27864A; }
+  .step-card:nth-child(7) .step-icon { background: #EEFAF1; }
+  .step-card:nth-child(7) .step-name { color: #27864A; }
+
+  .step-card:nth-child(9) .step-num { background: #C0392B; }
+  .step-card:nth-child(9) .step-icon { background: #FDF2F0; }
+  .step-card:nth-child(9) .step-name { color: #C0392B; }
+
+  /* Bottom bar */
+  .bottom-bar {
+    margin-top: 28px;
+    background: #F8F9FA;
+    border-radius: 8px;
+    border: 1px solid #E0E0E0;
+    padding: 14px 24px;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+  }
+  .bottom-bar strong { color: #222; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title">Web 服务交付完整链路</div>
+
+  <div class="chain">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-icon">&#x2318;</div>
+      <div class="step-name">编写应用</div>
+      <div class="step-desc">开发 Web 应用<br/>启动服务监听端口</div>
+      <div class="step-tech">python3 -m http.server 8080</div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-icon">&#x21C4;</div>
+      <div class="step-name">反向代理</div>
+      <div class="step-desc">Nginx/Caddy 转发<br/>:80 → :8080</div>
+      <div class="step-tech">Nginx / Caddy</div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-icon">&#x2699;</div>
+      <div class="step-name">服务化</div>
+      <div class="step-desc">systemd 管理<br/>开机自启，崩溃重启</div>
+      <div class="step-tech">systemd .service</div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-num">4</div>
+      <div class="step-icon">&#x1F512;</div>
+      <div class="step-name">加密传输</div>
+      <div class="step-desc">HTTPS 保护数据<br/>自签名 / Let's Encrypt</div>
+      <div class="step-tech">TLS / SSL</div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-num">5</div>
+      <div class="step-icon">&#x1F4CA;</div>
+      <div class="step-name">观测日志</div>
+      <div class="step-desc">access.log + journalctl<br/>排查问题，持续改进</div>
+      <div class="step-tech">access.log / journalctl</div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    每一步都是<strong>生产环境</strong>的基本要求。掌握 Web 服务交付的完整链路。
+  </div>
+</div>
+
+<script>
+(function(){
+  var c=document.querySelector('.container');
+  if(!c)return;
+  var ow=1600,oh=650;
+  function scale(){var sx=window.innerWidth/ow,sy=window.innerHeight/oh,s=Math.min(sx,sy,1);c.style.transform='scale('+s+')';c.style.transformOrigin='top center';document.body.style.overflow='hidden';document.body.style.height=(c.scrollHeight*s)+'px';}
+  window.addEventListener('resize',scale);scale();
+})();
+</script>
+</body>
+</html>

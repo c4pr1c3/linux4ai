@@ -23,17 +23,7 @@ output: revealjs::revealjs_presentation
 
 ## 直接暴露 vs 反向代理
 
-```
-# 方案 A：直接暴露（不推荐）
-用户浏览器 ──────────────────> Python 应用 (:8000)
-                 公网直达
-
-# 方案 B：反向代理（推荐）
-用户浏览器 ────> Nginx (:80/:443) ────> Python 应用 (:8000)
-                 公网入口          内网转发
-```
-
-反向代理 = 在用户和应用之间加一层「门卫」。
+<iframe src="assets/direct-vs-reverse-proxy.html" style="width:100%;height:620px;border:none;border-radius:8px;"></iframe>
 
 ---
 
@@ -180,15 +170,7 @@ tail -f access.log | awk '$9 == 500 {print $0}'
 
 HTTP 是明文传输，任何人都可以截获你的数据：
 
-```
-# HTTP（明文）
-客户端 ──── 用户名/密码明文 ────> 服务器
-           ↗ 中间人可以窃听
-
-# HTTPS（加密）
-客户端 ──── 加密数据 ────> 服务器
-           ↗ 中间人只能看到乱码
-```
+<iframe src="assets/http-vs-https.html" style="width:100%;height:620px;border:none;border-radius:8px;"></iframe>
 
 **TLS 握手**（简化版）：客户端和服务器协商密钥 → 之后所有数据加密传输。
 
@@ -364,12 +346,6 @@ systemctl --user journalctl -u myweb   # 查看日志也不需要 sudo
 
 ## 小结：Web 服务交付完整链路
 
-```
-1. 编写应用  →  python3 -m http.server 8080
-2. 反向代理  →  Nginx/Caddy 转发 :80 → :8080
-3. 服务化    →  systemd 管理，开机自启，崩溃自动重启
-4. 加密传输  →  HTTPS（自签名 / Let's Encrypt）
-5. 观测日志  →  access.log + journalctl 排查问题
-```
+<iframe src="assets/web-service-chain.html" style="width:100%;height:620px;border:none;border-radius:8px;"></iframe>
 
 每一步都是生产环境的基本要求。你现在已经掌握了 Web 服务交付的完整链路。

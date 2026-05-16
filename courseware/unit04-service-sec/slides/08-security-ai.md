@@ -87,24 +87,15 @@ sudo ufw deny from 192.168.1.100
 sudo ufw delete allow 80/tcp
 ```
 
+---
+
 > **铁律**：`ufw enable` 之前，务必先 `ufw allow 22/tcp`，否则 SSH 立刻断开！
 
 ---
 
 ## UFW 与 Nginx 联动：最小暴露面
 
-```
-                ┌─────────────────────────────┐
-                │        服务器               │
-                │                             │
-  Internet ──── │  UFW 防火墙                 │
-                │  ✓ 放行: 22, 80, 443        │
-                │  ✗ 拒绝: 8080 (内部端口)    │
-                │                             │
-                │  Nginx (:80/:443)           │
-                │    └─→ Python App (:8080)   │
-                └─────────────────────────────┘
-```
+<iframe src="assets/ufw-nginx-arch.html" style="width:100%;height:620px;border:none;border-radius:8px;"></iframe>
 
 ---
 
@@ -324,13 +315,7 @@ fi
 
 ## 安全的 AI 工作流
 
-```
-┌──────────┐    ┌──────────┐    ┌───────────┐    ┌──────────┐
-│  Prompt  │ →  │  Review  │ →  │   Test    │ →  │   Run    │
-│ 清晰需求 │    │ 人工审计 │    │ 非生产环境│    │ 记录结果 │
-│ 增加约束 │    │ 检查高危 │    │ VM/WSL    │    │ 保留日志 │
-└──────────┘    └──────────┘    └───────────┘    └──────────┘
-```
+<iframe src="assets/ai-secure-workflow.html" style="width:100%;height:620px;border:none;border-radius:8px;"></iframe>
 
 ---
 

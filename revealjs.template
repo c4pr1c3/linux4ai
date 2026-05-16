@@ -26,6 +26,19 @@ $if(theme)$
 $else$
   <link rel="stylesheet" href="$revealjs-url$/dist/theme/black.css" id="theme">
 $endif$
+  <style>
+.reveal .iframe-wrapper { position: relative; width: 100%; }
+.reveal .iframe-wrapper iframe { display: block; max-width: none; max-height: none; }
+.reveal .iframe-newwindow-btn {
+  position: absolute; top: 8px; right: 12px;
+  background: rgba(0,0,0,0.65); color: #fff;
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 13px; text-decoration: none;
+  opacity: 0.7; transition: opacity 0.2s;
+  z-index: 10;
+}
+.reveal .iframe-newwindow-btn:hover { opacity: 1; background: rgba(0,0,0,0.85); }
+  </style>
 $for(css)$
   <link rel="stylesheet" href="$css$"/>
 $endfor$
@@ -260,6 +273,23 @@ $if(mathjax)$
 $endif$
           { src: '$revealjs-url$/plugin/notes/notes.js', async: true }
         ]
+      });
+
+      // Add "open in new window" button to all iframes
+      Reveal.on('ready', function() {
+        document.querySelectorAll('.slides section iframe').forEach(function(iframe) {
+          var wrapper = document.createElement('div');
+          wrapper.className = 'iframe-wrapper';
+          var link = document.createElement('a');
+          link.className = 'iframe-newwindow-btn';
+          link.href = iframe.src;
+          link.target = '_blank';
+          link.title = '在新窗口打开';
+          link.textContent = '↗ 新窗口打开';
+          iframe.parentNode.insertBefore(wrapper, iframe);
+          wrapper.appendChild(iframe);
+          wrapper.appendChild(link);
+        });
       });
     </script>
   $for(include-after)$

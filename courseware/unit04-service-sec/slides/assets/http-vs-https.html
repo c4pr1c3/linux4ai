@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTTP vs HTTPS</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 100%; height: 100%;
+    background: #FFFFFF;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #222;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: 2vh 3vw;
+  }
+  .container {
+    position: relative;
+    width: 1500px; height: 680px;
+  }
+  .columns {
+    display: flex;
+    gap: 32px;
+    height: 100%;
+  }
+  .column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .col-header {
+    text-align: center;
+    padding: 16px 0;
+    border-radius: 10px 10px 0 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .col-header.insecure { background: #C0392B; }
+  .col-header.secure { background: #27864A; }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    border-radius: 0 0 10px 10px;
+    gap: 20px;
+  }
+  .content.insecure { background: #FDF2F0; border: 2px solid #E8B4A8; border-top: none; }
+  .content.secure { background: #EEFAF1; border: 2px solid #A8D8B8; border-top: none; }
+
+  /* Flow */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+  }
+  .node {
+    padding: 14px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+  }
+  .insecure .node { background: #fff; color: #C0392B; border: 2px solid #E8B4A8; }
+  .secure .node { background: #fff; color: #27864A; border: 2px solid #A8D8B8; }
+  .secure .node.shield { background: #27864A; color: #fff; border-color: #27864A; }
+
+  .arrow { font-size: 22px; font-weight: 700; }
+  .insecure .arrow { color: #C0392B; }
+  .secure .arrow { color: #27864A; }
+
+  /* Eavesdropper */
+  .eavesdropper {
+    text-align: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+  .insecure .eavesdropper { background: #FFF0EC; color: #B33A2C; border: 1px dashed #E8A8A0; }
+  .secure .eavesdropper { background: #E0F5E8; color: #1B6B3A; border: 1px dashed #A0D0A8; }
+
+  .label {
+    font-size: 13px;
+    text-align: center;
+  }
+  .insecure .label { color: #B05040; }
+  .secure .label { color: #4A8A5A; }
+
+  /* Data packet visual */
+  .packet {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-family: 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    margin: 2px;
+  }
+  .packet.plain { background: #FDECEA; color: #B33A2C; border: 1px solid #E8A8A0; }
+  .packet.encrypted { background: #E0F5E8; color: #1B6B3A; border: 1px solid #A0D0A8; }
+
+  /* TLS box */
+  .tls-box {
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: #E0F5E8;
+    border: 1px solid #A0D0A8;
+  }
+  .tls-box .title { font-size: 14px; font-weight: 700; color: #27864A; margin-bottom: 4px; }
+  .tls-box .desc { font-size: 12px; color: #555; line-height: 1.4; }
+
+  .warning-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .insecure .warning-badge { background: #FDECEA; color: #B33A2C; border: 1px solid #E8A8A0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="columns">
+    <!-- Left: HTTP -->
+    <div class="column">
+      <div class="col-header insecure">HTTP — 明文传输</div>
+      <div class="content insecure">
+        <div class="flow">
+          <div class="node">客户端</div>
+          <div class="arrow">→</div>
+          <div class="node">服务器</div>
+        </div>
+        <div class="label">传输内容：</div>
+        <div style="text-align:center;">
+          <span class="packet plain">用户名: admin</span>
+          <span class="packet plain">密码: 123456</span>
+          <span class="packet plain">Cookie: session=abc</span>
+        </div>
+        <div class="eavesdropper">
+          中间人可以窃听全部数据！
+        </div>
+        <div class="warning-badge">Chrome 标记为「不安全」</div>
+      </div>
+    </div>
+
+    <!-- Right: HTTPS -->
+    <div class="column">
+      <div class="col-header secure">HTTPS — 加密传输</div>
+      <div class="content secure">
+        <div class="flow">
+          <div class="node">客户端</div>
+          <div class="arrow">→</div>
+          <div class="node shield">TLS 加密</div>
+          <div class="arrow">→</div>
+          <div class="node">服务器</div>
+        </div>
+        <div class="label">传输内容：</div>
+        <div style="text-align:center;">
+          <span class="packet encrypted">x8F2a..9Bk1</span>
+          <span class="packet encrypted">Qm7..Zp3r</span>
+          <span class="packet encrypted">Ln2..Wt8y</span>
+        </div>
+        <div class="eavesdropper">
+          中间人只能看到乱码
+        </div>
+        <div class="tls-box">
+          <div class="title">TLS 握手（简化）</div>
+          <div class="desc">客户端与服务器协商密钥 → 之后所有数据加密传输</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var c=document.querySelector('.container');
+  if(!c)return;
+  var ow=1500,oh=680;
+  function scale(){var sx=window.innerWidth/ow,sy=window.innerHeight/oh,s=Math.min(sx,sy,1);c.style.transform='scale('+s+')';c.style.transformOrigin='top center';document.body.style.overflow='hidden';document.body.style.height=(c.scrollHeight*s)+'px';}
+  window.addEventListener('resize',scale);scale();
+})();
+</script>
+</body>
+</html>

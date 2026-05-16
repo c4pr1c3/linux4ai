@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>安全的 AI 工作流</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 100%; height: 100%;
+    background: #FFFFFF;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #222;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: 3vh 5vw;
+  }
+  .container {
+    position: relative;
+    width: 1600px; height: 620px;
+  }
+  .title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+  }
+
+  /* Horizontal chain */
+  .chain {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    justify-content: center;
+  }
+
+  .step-card {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .step-header {
+    width: 100%;
+    padding: 14px 0;
+    border-radius: 10px 10px 0 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .step-body {
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 280px;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #444;
+    text-align: left;
+  }
+  .step-item .bullet {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+
+  /* Color schemes per step */
+  .step-card:nth-child(1) .step-header { background: #6C5CE7; }
+  .step-card:nth-child(1) .step-body { background: #F5F3FF; border: 2px solid #D5C8F0; border-top: none; }
+  .step-card:nth-child(1) .bullet { background: #6C5CE7; }
+
+  .step-card:nth-child(3) .step-header { background: #0366D6; }
+  .step-card:nth-child(3) .step-body { background: #EBF4FF; border: 2px solid #A8C8E8; border-top: none; }
+  .step-card:nth-child(3) .bullet { background: #0366D6; }
+
+  .step-card:nth-child(5) .step-header { background: #E67E22; }
+  .step-card:nth-child(5) .step-body { background: #FFF8F0; border: 2px solid #F0D0A0; border-top: none; }
+  .step-card:nth-child(5) .bullet { background: #E67E22; }
+
+  .step-card:nth-child(7) .step-header { background: #27864A; }
+  .step-card:nth-child(7) .step-body { background: #EEFAF1; border: 2px solid #A8D8B8; border-top: none; }
+  .step-card:nth-child(7) .bullet { background: #27864A; }
+
+  /* Arrow connectors */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    padding-top: 80px;
+  }
+  .connector .arrow {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title">安全的 AI 工作流</div>
+
+  <div class="chain">
+    <div class="step-card">
+      <div class="step-header">Prompt</div>
+      <div class="step-body">
+        <div class="step-item"><div class="bullet">1</div><div>清晰需求描述</div></div>
+        <div class="step-item"><div class="bullet">2</div><div>增加安全约束条件</div></div>
+        <div class="step-item"><div class="bullet">3</div><div>明确操作范围与边界</div></div>
+      </div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-header">Review</div>
+      <div class="step-body">
+        <div class="step-item"><div class="bullet">1</div><div>人工审计 AI 输出</div></div>
+        <div class="step-item"><div class="bullet">2</div><div>检查高危命令<br/><small style="color:#888">rm / chmod 777 / dd / curl|bash</small></div></div>
+        <div class="step-item"><div class="bullet">3</div><div>验证逻辑正确性</div></div>
+      </div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-header">Test</div>
+      <div class="step-body">
+        <div class="step-item"><div class="bullet">1</div><div>在 VM / WSL 中验证</div></div>
+        <div class="step-item"><div class="bullet">2</div><div>不要在生产环境直接跑</div></div>
+        <div class="step-item"><div class="bullet">3</div><div>验证边界情况</div></div>
+      </div>
+    </div>
+
+    <div class="connector"><span class="arrow">→</span></div>
+
+    <div class="step-card">
+      <div class="step-header">Run</div>
+      <div class="step-body">
+        <div class="step-item"><div class="bullet">1</div><div>执行并记录结果</div></div>
+        <div class="step-item"><div class="bullet">2</div><div>保留操作日志</div></div>
+        <div class="step-item"><div class="bullet">3</div><div>确认预期效果达成</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var c=document.querySelector('.container');
+  if(!c)return;
+  var ow=1600,oh=620;
+  function scale(){var sx=window.innerWidth/ow,sy=window.innerHeight/oh,s=Math.min(sx,sy,1);c.style.transform='scale('+s+')';c.style.transformOrigin='top center';document.body.style.overflow='hidden';document.body.style.height=(c.scrollHeight*s)+'px';}
+  window.addEventListener('resize',scale);scale();
+})();
+</script>
+</body>
+</html>
