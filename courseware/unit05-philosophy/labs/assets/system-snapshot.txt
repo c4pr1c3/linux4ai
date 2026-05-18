@@ -1,0 +1,91 @@
+# === SYSLOG SNAPSHOT ===
+# 模拟 syslog 日志 — 包含 INFO / WARN / ERROR 三种级别
+# 涉及服务：sshd, nginx, cron, docker, systemd
+# 时间范围：2026-01-15 08:00 至 2026-01-15 12:00
+
+2026-01-15T08:01:12 server sshd[1102]: ERROR Failed password for invalid user admin from 10.0.0.15 port 34522 ssh2
+2026-01-15T08:01:14 server sshd[1102]: ERROR Failed password for invalid user admin from 10.0.0.15 port 34523 ssh2
+2026-01-15T08:02:30 server nginx[2200]: INFO GET /index.html 200 3254 bytes
+2026-01-15T08:03:45 server nginx[2200]: ERROR upstream timed out (110: Connection timed out) while connecting to upstream
+2026-01-15T08:04:00 server cron[3300]: INFO Running scheduled task backup.sh
+2026-01-15T08:05:12 server sshd[1102]: ERROR Failed password for root from 10.0.0.15 port 34524 ssh2
+2026-01-15T08:06:00 server systemd[1]: INFO Started Session 42 of user appuser
+2026-01-15T08:07:30 server nginx[2200]: ERROR 502 Bad Gateway for client 192.168.1.55
+2026-01-15T08:08:15 server docker[4400]: INFO Container webapp started successfully
+2026-01-15T08:09:00 server nginx[2200]: WARN Slow response: 3.2s for GET /api/data
+2026-01-15T08:10:22 server sshd[1102]: ERROR Failed password for invalid user test from 10.0.0.15 port 34525 ssh2
+2026-01-15T08:11:00 server nginx[2200]: ERROR upstream timed out (110: Connection timed out) while connecting to upstream
+2026-01-15T08:12:30 server cron[3300]: INFO Running scheduled task cleanup.sh
+2026-01-15T08:13:45 server docker[4400]: ERROR Failed to pull image registry.local/webapp:v2.1: connection refused
+2026-01-15T08:14:00 server nginx[2200]: INFO GET /health 200 15 bytes
+2026-01-15T08:15:30 server sshd[1102]: ERROR Failed password for invalid user admin from 10.0.0.15 port 34526 ssh2
+2026-01-15T08:16:00 server nginx[2200]: ERROR 502 Bad Gateway for client 192.168.1.55
+2026-01-15T08:17:15 server systemd[1]: INFO Reloading service configuration
+2026-01-15T08:18:00 server nginx[2200]: ERROR upstream timed out (110: Connection timed out) while connecting to upstream
+2026-01-15T08:19:30 server cron[3300]: INFO Running scheduled task logrotate.sh
+2026-01-15T08:20:00 server sshd[1102]: ERROR Failed password for invalid user ubuntu from 10.0.0.15 port 34527 ssh2
+2026-01-15T08:21:00 server nginx[2200]: INFO GET /robots.txt 200 138 bytes
+2026-01-15T08:22:15 server nginx[2200]: ERROR 502 Bad Gateway for client 192.168.1.60
+2026-01-15T08:23:00 server docker[4400]: INFO Container db migrated successfully
+2026-01-15T08:24:30 server sshd[1102]: ERROR Failed password for root from 10.0.0.15 port 34528 ssh2
+2026-01-15T08:25:00 server nginx[2200]: ERROR upstream timed out (110: Connection timed out) while connecting to upstream
+2026-01-15T08:26:15 server cron[3300]: ERROR Cron job backup.sh failed with exit status 1
+2026-01-15T08:27:00 server nginx[2200]: WARN Slow response: 5.1s for GET /api/users
+2026-01-15T08:28:30 server systemd[1]: ERROR Failed to start foobar.service: Unit not found
+2026-01-15T08:29:00 server docker[4400]: ERROR Container webapp exited with code 137 (OOM killed)
+2026-01-15T08:30:00 server nginx[2200]: ERROR 502 Bad Gateway for client 192.168.1.55
+2026-01-15T08:31:15 server sshd[1102]: ERROR Failed password for invalid user admin from 10.0.0.15 port 34529 ssh2
+2026-01-15T08:32:00 server nginx[2200]: ERROR upstream timed out (110: Connection timed out) while connecting to upstream
+2026-01-15T08:33:30 server cron[3300]: INFO Running scheduled task healthcheck.sh
+2026-01-15T08:34:00 server docker[4400]: ERROR Failed to pull image registry.local/redis:latest: TLS handshake timeout
+2026-01-15T08:35:15 server nginx[2200]: INFO GET /favicon.ico 200 4286 bytes
+2026-01-15T08:36:00 server sshd[1102]: ERROR Failed password for invalid user guest from 10.0.0.15 port 34530 ssh2
+2026-01-15T08:37:30 server nginx[2200]: ERROR 502 Bad Gateway for client 192.168.1.70
+2026-01-15T08:38:00 server cron[3300]: ERROR Cron job cleanup.sh failed with exit status 2
+2026-01-15T08:39:15 server docker[4400]: INFO Container cache started successfully
+2026-01-15T08:40:00 server nginx[2200]: WARN Slow response: 2.8s for GET /static/app.js
+2026-01-15T09:00:00 server systemd[1]: INFO Starting daily apt download activities
+2026-01-15T09:15:00 server nginx[2200]: ERROR upstream timed out (110: Connection timed out) while connecting to upstream
+2026-01-15T09:30:00 server sshd[1102]: ERROR Failed password for root from 10.0.0.15 port 34531 ssh2
+2026-01-15T10:00:00 server docker[4400]: INFO Health check passed for container webapp
+2026-01-15T10:30:00 server nginx[2200]: ERROR 503 Service Temporarily Unavailable
+2026-01-15T11:00:00 server cron[3300]: INFO Running scheduled task backup.sh
+2026-01-15T11:30:00 server nginx[2200]: WARN High memory usage detected: 85% utilized
+
+# === PROCESS SNAPSHOT ===
+# 模拟 ps aux 格式输出 — USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND
+
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.3 169344 13296 ?        Ss   Jan10   2:30 /sbin/init
+root        42  0.0  0.1  58684  4208 ?        Ss   Jan10   0:15 /usr/sbin/sshd -D
+www-data   234  1.5  4.2 345672 168000 ?       S    Jan10  48:15 nginx: worker process
+mysql      456  3.2 15.6 1234567 624000 ?      Sl   Jan10 102:30 /usr/sbin/mysqld
+root       500  2.1  8.3  987654 332000 ?      Sl   Jan10  67:20 /usr/bin/dockerd
+appuser    789  0.5  3.1  456789 124000 ?       S    Jan10  15:20 python3 /opt/app/main.py
+root       890  0.1  0.5  65432  20000 ?        S    Jan10   3:45 /usr/sbin/cron -f
+www-data   912  0.8  2.4  234567  96000 ?       S    Jan10  22:10 php-fpm: pool www
+appuser   1024  0.3  1.2  123456  48000 ?       S    Jan10   8:30 node /opt/api/server.js
+root      1100  0.0  0.2  72345  8192 ?        S    Jan10   0:05 /usr/sbin/rsyslogd -n
+nobody    1156  0.0  0.1  34567  4096 ?        S    Jan10   0:00 /usr/sbin/nginx
+appuser   1200  1.0  2.8  567890 112000 ?       S    Jan10  30:45 java -jar /opt/app.jar
+redis     1350  0.2  1.5  67890  60000 ?       Ssl  Jan10   6:12 /usr/bin/redis-server
+
+# === DISK SNAPSHOT ===
+# 模拟 df -h 格式输出 — Filesystem Size Used Avail Use% Mounted
+
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        50G   35G   15G  70% /
+/dev/sda2       200G  180G   20G  90% /data
+/dev/sdb1       500G  100G  400G  20% /backup
+tmpfs            16G   12G    4G  75% /dev/shm
+/dev/sdc1       100G   95G    5G  95% /archive
+/dev/sdd1       300G   45G  255G  15% /mnt/external
+
+# === NETWORK SNAPSHOT ===
+# 模拟 /proc/net/dev 格式输出 — Inter-| Receive | Transmit
+
+Inter-|   Receive                                      |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+  eth0: 1234567890 9876543    0    5    0     0          0         0 876543210 7654321    0    0    0     0       0          0
+    lo: 56789012  345678    0    0    0     0          0         0 56789012  345678    0    0    0     0       0          0
+  docker0: 9876543  123456    0    0    0     0          0         0 8765432  111111    0    0    0     0       0          0
